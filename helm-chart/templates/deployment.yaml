@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: penny-k8s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: penny-k8s
+  template:
+    metadata:
+      labels:
+        app: penny-k8s
+    spec:
+      serviceAccountName: penny-k8s-sa
+      containers:
+      - name: dashboard
+        image: 192.168.88.23:5000/penny-k8s:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

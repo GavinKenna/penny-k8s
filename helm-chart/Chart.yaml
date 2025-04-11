@@ -1,0 +1,5 @@
+apiVersion: v2
+name: penny-k8s
+description: A Helm chart for deploying Penny Kubernetes Dashboard
+version: 0.1.0
+appVersion: "1.0"
