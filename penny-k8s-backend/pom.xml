@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ie.gkenna</groupId>
-	<artifactId>penny-k8s</artifactId>
+	<artifactId>penny-k8s-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>penny-k8s</name>
-	<description>penny-k8s</description>
+	<name>penny-k8s-backend</name>
+	<description>penny-k8s-backend</description>
 	<url/>
 	<licenses>
 		<license/>

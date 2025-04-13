@@ -7,18 +7,29 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: penny-k8s
+      app: penny-k8s-backend  # This must match the service selector
   template:
     metadata:
       labels:
-        app: penny-k8s
+        app: penny-k8s-backend  # Correct the label to match the service
     spec:
       serviceAccountName: penny-k8s-sa
       containers:
-      - name: dashboard
-        image: 192.168.88.23:5000/penny-k8s:latest
+      - name: penny-k8s-backend
+        image: 192.168.88.23:5000/penny-k8s-backend:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8080   # Expose port 8080 for backend container
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      - name: penny-k8s-frontend
+        image: 192.168.88.23:5000/penny-k8s-frontend:latest
+        ports:
+        - containerPort: 80    # Expose port 80 for frontend container
         resources:
           requests:
             memory: "128Mi"

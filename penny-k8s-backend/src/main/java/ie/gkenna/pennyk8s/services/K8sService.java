@@ -44,4 +44,14 @@ public class K8sService {
             throw new RuntimeException("Failed to get pods", e);
         }
     }
+
+    public String getPodLogs(String namespace, String podName) {
+        try {
+            return api.readNamespacedPodLog(podName, namespace, null, null, null, null, null, null, null, null, null);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get logs for pod " + podName, e);
+        }
+    }
+
+
 }

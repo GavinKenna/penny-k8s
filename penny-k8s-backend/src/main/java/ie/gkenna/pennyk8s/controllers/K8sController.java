@@ -23,4 +23,9 @@ public class K8sController {
     public List<PodInfo> getPods() {
         return k8sService.getAllPods();
     }
+
+    @GetMapping("/pods/{namespace}/{podName}/logs")
+    public String getPodLogs(@PathVariable String namespace, @PathVariable String podName) {
+        return k8sService.getPodLogs(namespace, podName);
+    }
 }
