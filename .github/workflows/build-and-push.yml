@@ -10,6 +10,10 @@ jobs:
     name: Build and Push Backend
     runs-on: ubuntu-latest
     steps:
+      - name: Set lowercase repo owner
+        id: repo
+        run: echo "REPO_OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
       - name: Checkout Repository
         uses: actions/checkout@v3
 
@@ -33,16 +37,19 @@ jobs:
       - name: Build Docker Image for Backend
         run: |
           docker build -f penny-k8s/penny-k8s-backend/Dockerfile \
-            -t ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-backend:${{ github.sha }} \
+            -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ github.sha }} \
             penny-k8s/penny-k8s-backend
 
       - name: Push Docker Image for Backend
-        run: docker push ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-backend:${{ github.sha }}
+        run: docker push ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ github.sha }}
 
   build-frontend:
     name: Build and Push Frontend
     runs-on: ubuntu-latest
     steps:
+      - name: Set lowercase repo owner
+        id: repo
+        run: echo "REPO_OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
       - name: Checkout Repository
         uses: actions/checkout@v3
 
@@ -63,8 +70,8 @@ jobs:
       - name: Build Docker Image for Frontend
         run: |
           docker build -f penny-k8s/penny-k8s-frontend/Dockerfile \
-            -t ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-frontend:${{ github.sha }} \
+            -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ github.sha }} \
             penny-k8s/penny-k8s-frontend
 
       - name: Push Docker Image for Frontend
-        run: docker push ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-frontend:${{ github.sha }}
+        run: docker push ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ github.sha }}
