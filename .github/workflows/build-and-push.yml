@@ -38,8 +38,7 @@ jobs:
         working-directory: penny-k8s-backend
         run: |
           docker build -f Dockerfile \
-            -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ github.sha }} \
-            penny-k8s-backend
+            -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ github.sha }}
 
       - name: Push Docker Image for Backend
         run: docker push ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ github.sha }}
@@ -72,8 +71,7 @@ jobs:
         working-directory: penny-k8s-frontend
         run: |
           docker build -f Dockerfile \
-            -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ github.sha }} \
-            penny-k8s-frontend
+            -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ github.sha }}
 
       - name: Push Docker Image for Frontend
         run: docker push ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ github.sha }}
