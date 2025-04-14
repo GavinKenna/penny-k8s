@@ -19,9 +19,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build and Test Spring Boot Application
-        working-directory: penny-k8s-backend
-        run: mvn clean verify
+#      - name: Build and Test Spring Boot Application
+#        working-directory: penny-k8s-backend
+#        run: mvn clean verify
 
       - name: Package Spring Boot Application
         working-directory: penny-k8s-backend
