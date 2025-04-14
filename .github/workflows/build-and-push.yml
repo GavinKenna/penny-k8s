@@ -19,9 +19,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-#      - name: Build and Test Spring Boot Application
-#        working-directory: penny-k8s-backend
-#        run: mvn clean verify
+      - name: Build and Test Spring Boot Application
+        working-directory: penny-k8s-backend
+        run: mvn clean verify
 
       - name: Package Spring Boot Application
         working-directory: penny-k8s-backend
@@ -33,11 +33,11 @@ jobs:
       - name: Build Docker Image for Backend
         run: |
           docker build -f penny-k8s/penny-k8s-backend/Dockerfile \
-            -t ghcr.io/${{ github.repository_owner }}/penny-k8s-backend:${{ github.sha }} \
+            -t ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-backend:${{ github.sha }} \
             penny-k8s/penny-k8s-backend
 
       - name: Push Docker Image for Backend
-        run: docker push ghcr.io/${{ github.repository_owner }}/penny-k8s-backend:${{ github.sha }}
+        run: docker push ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-backend:${{ github.sha }}
 
   build-frontend:
     name: Build and Push Frontend
@@ -63,8 +63,8 @@ jobs:
       - name: Build Docker Image for Frontend
         run: |
           docker build -f penny-k8s/penny-k8s-frontend/Dockerfile \
-            -t ghcr.io/${{ github.repository_owner }}/penny-k8s-frontend:${{ github.sha }} \
+            -t ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-frontend:${{ github.sha }} \
             penny-k8s/penny-k8s-frontend
 
       - name: Push Docker Image for Frontend
-        run: docker push ghcr.io/${{ github.repository_owner }}/penny-k8s-frontend:${{ github.sha }}
+        run: docker push ghcr.io/${{ github.github.repository_owner.lower() }}/penny-k8s-frontend:${{ github.sha }}
