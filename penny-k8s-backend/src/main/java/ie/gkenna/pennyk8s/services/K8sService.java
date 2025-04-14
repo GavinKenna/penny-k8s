@@ -1,5 +1,6 @@
 package ie.gkenna.pennyk8s.services;
 
+import ie.gkenna.pennyk8s.models.ConfigMapInfo;
 import ie.gkenna.pennyk8s.models.NodeInfo;
 import ie.gkenna.pennyk8s.models.PodInfo;
 import io.kubernetes.client.openapi.ApiClient;
@@ -42,6 +43,17 @@ public class K8sService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Failed to get pods", e);
+        }
+    }
+
+    public List<ConfigMapInfo> getAllConfigMaps() {
+        try {
+            return api.listConfigMapForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
+                    .getItems().stream()
+                    .map(ConfigMapInfo::fromConfigMap)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get ConfigMaps", e);
         }
     }
 

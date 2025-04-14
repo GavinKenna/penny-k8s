@@ -29,3 +29,13 @@ export async function fetchLogs(namespace, podName) {
         return 'Error loading logs.'
     }
 }
+
+export async function fetchConfigMaps() {
+    try {
+        const response = await axios.get('/api/configmaps')
+        return response.data
+    } catch (error) {
+        console.error('Failed to fetch configmaps:', error)
+        return []
+    }
+}

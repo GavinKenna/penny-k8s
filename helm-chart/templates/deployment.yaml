@@ -16,6 +16,7 @@ spec:
       serviceAccountName: penny-k8s-sa
       containers:
       - name: penny-k8s-backend
+        imagePullPolicy: Always
         image: 192.168.88.23:5000/penny-k8s-backend:latest
         ports:
         - containerPort: 8080   # Expose port 8080 for backend container
