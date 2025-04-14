@@ -9,6 +9,9 @@ jobs:
   build-backend:
     name: Build and Push Backend
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Set lowercase repo owner
         id: repo
@@ -46,6 +49,9 @@ jobs:
   build-frontend:
     name: Build and Push Frontend
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Set lowercase repo owner
         id: repo
