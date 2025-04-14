@@ -10,6 +10,13 @@ Penny K8s Dashboard is a web application that provides an overview of the nodes 
 - Displays pod status and relevant details such as pod IP, start time, and containers.
 - View logs of individual pods directly in the UI.
 
+## Screenshots:
+![Node dashboard](./docs/assets/penny-nodes.png)
+![Pod dashboard](./docs/assets/penny-pods.png)
+![ConfigMap dashboard](./docs/assets/penny-configmap.png)
+![Individual ConfigMap dashboard](./docs/assets/penny-config.png)
+
+
 ## Tech Stack
 
 - **Frontend**:
