@@ -20,7 +20,7 @@ jobs:
           java-version: '11'
 
       - name: Build and Test Spring Boot Application
-        working-directory: penny-k8s/penny-k8s-backend
+        working-directory: penny-k8s-backend
         run: mvn clean verify
 
       - name: Package Spring Boot Application
