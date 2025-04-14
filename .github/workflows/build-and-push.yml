@@ -2,7 +2,7 @@ name: Build and Push Docker Images to GHCR
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   # Optionally, trigger on tags as well:
   # push:
   #   tags:
