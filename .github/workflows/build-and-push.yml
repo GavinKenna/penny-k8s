@@ -3,10 +3,7 @@ name: Build and Push Docker Images to GHCR
 on:
   push:
     branches: [ master ]
-  # Optionally, trigger on tags as well:
-  # push:
-  #   tags:
-  #     - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   build-backend:
@@ -23,9 +20,11 @@ jobs:
           java-version: '11'
 
       - name: Build and Test Spring Boot Application
+        working-directory: penny-k8s/penny-k8s-backend
         run: mvn clean verify
 
       - name: Package Spring Boot Application
+        working-directory: penny-k8s/penny-k8s-backend
         run: mvn package -DskipTests
 
       - name: Log in to GHCR
@@ -33,7 +32,9 @@ jobs:
 
       - name: Build Docker Image for Backend
         run: |
-          docker build -f penny-k8s/penny-k8s-backend/Dockerfile  -t ghcr.io/${{ github.repository_owner }}/penny-k8s-backend:${{ github.sha }} .
+          docker build -f penny-k8s/penny-k8s-backend/Dockerfile \
+            -t ghcr.io/${{ github.repository_owner }}/penny-k8s-backend:${{ github.sha }} \
+            penny-k8s/penny-k8s-backend
 
       - name: Push Docker Image for Backend
         run: docker push ghcr.io/${{ github.repository_owner }}/penny-k8s-backend:${{ github.sha }}
@@ -51,7 +52,7 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies and Build Frontend
-        working-directory: penny-k8s-frontend
+        working-directory: penny-k8s/penny-k8s-frontend
         run: |
           npm install
           npm run build
@@ -60,9 +61,10 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker Image for Frontend
-        working-directory: penny-k8s-frontend
         run: |
-          docker build -f penny-k8s/penny-k8s-frontend/Dockerfile  -t ghcr.io/${{ github.repository_owner }}/penny-k8s-frontend:${{ github.sha }} .
+          docker build -f penny-k8s/penny-k8s-frontend/Dockerfile \
+            -t ghcr.io/${{ github.repository_owner }}/penny-k8s-frontend:${{ github.sha }} \
+            penny-k8s/penny-k8s-frontend
 
       - name: Push Docker Image for Frontend
         run: docker push ghcr.io/${{ github.repository_owner }}/penny-k8s-frontend:${{ github.sha }}
