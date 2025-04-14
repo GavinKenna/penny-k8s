@@ -24,7 +24,7 @@ jobs:
         run: mvn clean verify
 
       - name: Package Spring Boot Application
-        working-directory: penny-k8s/penny-k8s-backend
+        working-directory: penny-k8s-backend
         run: mvn package -DskipTests
 
       - name: Log in to GHCR
@@ -52,7 +52,7 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies and Build Frontend
-        working-directory: penny-k8s/penny-k8s-frontend
+        working-directory: penny-k8s-frontend
         run: |
           npm install
           npm run build
