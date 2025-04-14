@@ -36,7 +36,7 @@ jobs:
 
       - name: Build Docker Image for Backend
         run: |
-          docker build -f penny-k8s/penny-k8s-backend/Dockerfile \
+          docker build -f Dockerfile \
             -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ github.sha }} \
             penny-k8s/penny-k8s-backend
 
@@ -69,7 +69,7 @@ jobs:
 
       - name: Build Docker Image for Frontend
         run: |
-          docker build -f penny-k8s/penny-k8s-frontend/Dockerfile \
+          docker build -f Dockerfile \
             -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ github.sha }} \
             penny-k8s/penny-k8s-frontend
 
