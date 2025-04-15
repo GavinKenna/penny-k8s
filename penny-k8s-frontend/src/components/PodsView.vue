@@ -47,28 +47,70 @@
         class="bg-white p-6 rounded-2xl shadow-md mb-6"
     >
       <details open>
-        <summary class="flex items-center text-xl font-semibold text-blue-600 mb-4 cursor-pointer">
-          <svg class="w-6 h-6 mr-2 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 20v-6m0 0V4m0 10h6m-6 0H6" />
+        <summary
+            class="flex items-center text-xl font-semibold text-blue-600 mb-4 cursor-pointer"
+        >
+          <svg
+              class="w-6 h-6 mr-2 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+          >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 20v-6m0 0V4m0 10h6m-6 0H6"
+            />
           </svg>
           {{ nodeName }}
-          <svg v-if="!isNodeExpanded(nodeName)" class="ml-auto w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          <svg
+              v-if="!isNodeExpanded(nodeName)"
+              class="ml-auto w-4 h-4 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+          >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 9l-7 7-7-7"
+            />
           </svg>
-          <svg v-else class="ml-auto w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+          <svg
+              v-else
+              class="ml-auto w-4 h-4 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+          >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 15l7-7 7 7"
+            />
           </svg>
         </summary>
 
         <ul>
-          <li v-for="pod in pods" :key="pod.name" class="border-b last:border-none px-2 py-3">
+          <li
+              v-for="pod in pods"
+              :key="pod.name"
+              class="border-b last:border-none px-2 py-3"
+          >
             <details>
               <summary class="flex justify-between items-center cursor-pointer">
                 <div>
                   <span class="font-medium text-gray-800">{{ pod.name }}</span>
                   <small class="ml-2 text-gray-500">({{ pod.namespace }})</small>
                 </div>
-                <span :class="pod.status === 'Running' ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'">
+                <span
+                    :class="pod.status === 'Running'
+                    ? 'text-green-500 font-semibold'
+                    : 'text-red-500 font-semibold'"
+                >
                   {{ pod.status }}
                 </span>
               </summary>
@@ -105,12 +147,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { fetchNodes, fetchPods, fetchLogs } from '../services/penny-service.js'
+import { ref, computed } from 'vue'
+import { fetchNodes, fetchLogs } from '../services/penny-service.js'
+import { useK8sRealtime } from '../composables/useK8sRealtime.js'
 
-const selectedPodLogs = ref({})
 const searchTerm = ref('')
 const nodeFilter = ref('all')
+const selectedPodLogs = ref({})
+
+// WebSocket-powered pods list
+const { pods } = useK8sRealtime()
+
+const nodes = ref([])
 
 const fetchPodLogs = async (pod) => {
   if (selectedPodLogs.value[pod.name]) return
@@ -122,14 +170,6 @@ const formatDate = (dateStr) => {
   const d = new Date(dateStr)
   return d.toLocaleString()
 }
-
-const nodes = ref([])
-const pods = ref([])
-
-onMounted(async () => {
-  nodes.value = await fetchNodes()
-  pods.value = await fetchPods()
-})
 
 const podsPerNode = computed(() => {
   const map = {}
@@ -173,6 +213,11 @@ const filterNodes = (filter) => {
 const isNodeExpanded = (nodeName) => {
   return podsPerNode.value[nodeName].length > 0
 }
+
+// Load nodes (you could make this websocket too later)
+fetchNodes().then((res) => {
+  nodes.value = res
+})
 </script>
 
 <style scoped>

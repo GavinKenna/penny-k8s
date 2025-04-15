@@ -76,13 +76,15 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { fetchConfigMaps } from '../services/penny-service.js'
+import { useK8sRealtime } from '../composables/useK8sRealtime.js'
 
-const configMaps = ref([])
+
+const { pods } = useK8sRealtime()
 const selectedConfigMap = ref(null)
-
-onMounted(async () => {
-  configMaps.value = await fetchConfigMaps()
-})
+//
+// onMounted(async () => {
+//   configMaps.value = await fetchConfigMaps()
+// })
 
 const selectConfigMap = (cm) => {
   selectedConfigMap.value = cm

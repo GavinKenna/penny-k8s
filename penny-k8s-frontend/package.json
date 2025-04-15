@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
+    "@stomp/stompjs": "^7.1.1",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
     "bootstrap-icons": "^1.11.3",
     "lucide-vue-next": "^0.488.0",
+    "sockjs-client": "^1.6.1",
     "vue": "^3.5.13"
   },
   "devDependencies": {
