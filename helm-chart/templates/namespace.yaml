@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: penny-k8s
+  name: {{ .Values.namespace }}

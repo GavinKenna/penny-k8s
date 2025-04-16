@@ -2,3 +2,7 @@ image:
   repository: 192.168.88.23:5000/penny-k8s
   tag: latest
   pullPolicy: Always
+
+namespace: penny-k8s
+
+installClusterRole: true
