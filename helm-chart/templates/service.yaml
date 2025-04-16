@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: penny-k8s-backend
-  namespace: penny-k8s
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     app: penny-k8s-backend  # This should match the backend's app label
@@ -14,7 +14,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: penny-k8s-frontend
-  namespace: penny-k8s
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     app: penny-k8s-frontend
