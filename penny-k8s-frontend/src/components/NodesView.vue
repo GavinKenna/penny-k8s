@@ -26,11 +26,36 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchNodes } from '../services/penny-service.js'
+import axios from 'axios'
+import { useK8sRealtime } from '../composables/useK8sRealtime.js'
 
-const nodes = ref([])
+const selectedNode = ref(null)
+const errorMsg = ref(null)
 
+// Realtime Nodes comes from WebSocket
+const { nodes } = useK8sRealtime()
+
+// Optional: Load REST version first in case WebSocket is delayed
 onMounted(async () => {
-  nodes.value = await fetchNodes()
+  try {
+    const response = await axios.get('/api/nodes')
+    // Only preload if WebSocket hasn't updated anything yet
+    if (nodes.value.length === 0) {
+      nodes.value = response.data
+    }
+  } catch (error) {
+    console.error('Error fetching Nodes via REST:', error)
+    errorMsg.value = 'Failed to load Nodes'
+  }
 })
+
+const selectNode = (cm) => {
+  selectedNode.value = cm
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'N/A'
+  const d = new Date(dateStr)
+  return d.toLocaleString()
+}
 </script>

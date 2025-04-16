@@ -19,17 +19,45 @@ export function useK8sRealtime() {
 
                 stompClient.subscribe('/topic/nodes', message => {
                     try {
-                        nodes.value = JSON.parse(message.body)
+                        const event = JSON.parse(message.body)
+
+                        if (event.eventType === 'ADDED') {
+                            if (!nodes.value.some(cm => cm.name === event.Node.name)) {
+                                nodes.value = [...nodes.value, event.Node]
+                            }
+                        } else if (event.eventType === 'MODIFIED') {
+                            nodes.value = nodes.value.map(cm =>
+                                cm.name === event.Node.name ? event.Node : cm
+                            )
+                        } else if (event.eventType === 'DELETED') {
+                            nodes.value = nodes.value.filter(cm => cm.name !== event.Node.name)
+                        }
+
+                        console.log("Updated Nodes:", nodes.value)
                     } catch (e) {
-                        console.error('Error parsing nodes message', e)
+                        console.error('Error parsing Nodes message', e)
                     }
                 })
 
                 stompClient.subscribe('/topic/pods', message => {
                     try {
-                        pods.value = JSON.parse(message.body)
+                        const event = JSON.parse(message.body)
+
+                        if (event.eventType === 'ADDED') {
+                            if (!pods.value.some(cm => cm.name === event.pod.name)) {
+                                pods.value = [...pods.value, event.pod]
+                            }
+                        } else if (event.eventType === 'MODIFIED') {
+                            pods.value = pods.value.map(cm =>
+                                cm.name === event.pod.name ? event.pod : cm
+                            )
+                        } else if (event.eventType === 'DELETED') {
+                            pods.value = pods.value.filter(cm => cm.name !== event.pod.name)
+                        }
+
+                        console.log("Updated Pods:", pods.value)
                     } catch (e) {
-                        console.error('Error parsing pods message', e)
+                        console.error('Error parsing Pods message', e)
                     }
                 })
 

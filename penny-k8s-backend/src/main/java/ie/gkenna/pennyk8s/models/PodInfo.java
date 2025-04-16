@@ -29,4 +29,60 @@ public class PodInfo {
         info.startTime = String.valueOf(pod.getStatus().getStartTime());
         return info;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
+
+    public String getPodIP() {
+        return podIP;
+    }
+
+    public void setPodIP(String podIP) {
+        this.podIP = podIP;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public List<ContainerInfo> getContainers() {
+        return containers;
+    }
+
+    public void setContainers(List<ContainerInfo> containers) {
+        this.containers = containers;
+    }
 }

@@ -147,18 +147,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { fetchNodes, fetchLogs } from '../services/penny-service.js'
+import { ref, onMounted, computed } from 'vue'
+import axios from 'axios'
 import { useK8sRealtime } from '../composables/useK8sRealtime.js'
+import { fetchNodes, fetchPods, fetchLogs } from '../services/penny-service.js'
 
+const selectedPodLogs = ref({})
 const searchTerm = ref('')
 const nodeFilter = ref('all')
-const selectedPodLogs = ref({})
-
-// WebSocket-powered pods list
-const { pods } = useK8sRealtime()
-
-const nodes = ref([])
 
 const fetchPodLogs = async (pod) => {
   if (selectedPodLogs.value[pod.name]) return
@@ -169,6 +165,36 @@ const fetchPodLogs = async (pod) => {
 const formatDate = (dateStr) => {
   const d = new Date(dateStr)
   return d.toLocaleString()
+}
+
+const nodes = ref([])
+const selectedPod = ref(null)
+const errorMsg = ref(null)
+
+// Realtime Pods comes from WebSocket
+const { pods } = useK8sRealtime()
+
+// Optional: Load REST version first in case WebSocket is delayed
+onMounted(async () => {
+  try {
+    const response = await axios.get('/api/pods')
+    // Only preload if WebSocket hasn't updated anything yet
+    if (pods.value.length === 0) {
+      pods.value = response.data
+    }
+    const responseNode = await axios.get('/api/nodes')
+    // Only preload if WebSocket hasn't updated anything yet
+    if (nodes.value.length === 0) {
+      nodes.value = responseNode.data
+    }
+  } catch (error) {
+    console.error('Error fetching Pods via REST:', error)
+    errorMsg.value = 'Failed to load Pods'
+  }
+})
+
+const selectPod = (cm) => {
+  selectedPod.value = cm
 }
 
 const podsPerNode = computed(() => {
@@ -213,11 +239,6 @@ const filterNodes = (filter) => {
 const isNodeExpanded = (nodeName) => {
   return podsPerNode.value[nodeName].length > 0
 }
-
-// Load nodes (you could make this websocket too later)
-fetchNodes().then((res) => {
-  nodes.value = res
-})
 </script>
 
 <style scoped>

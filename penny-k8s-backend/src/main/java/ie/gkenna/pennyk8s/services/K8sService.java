@@ -5,6 +5,8 @@ import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
+import io.kubernetes.client.openapi.models.V1Node;
+import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Watch;
 import ie.gkenna.pennyk8s.models.ConfigMapInfo;
@@ -81,10 +83,19 @@ public class K8sService {
     public void watchConfigMaps(Consumer<Watch.Response<ConfigMapInfo>> onEvent) {
         try (Watch<V1ConfigMap> watch = Watch.createWatch(
                 client,
-                api.listNamespacedConfigMapCall(
-                        "default",    // Change namespace as needed
-                        null, null, null, null, null, null, null, null,10, Boolean.TRUE, null),
-                new TypeToken<Watch.Response<V1ConfigMap>>(){}.getType()
+                api.listConfigMapForAllNamespacesCall(
+                        null, // pretty
+                        null, // allowWatchBookmarks
+                        null, // _continue
+                        null, // fieldSelector
+                        null, // labelSelector
+                        null, // limit
+                        null, // resourceVersion
+                        null,
+                        60,   // timeoutSeconds
+                        true, // watch
+                        null  // _callback
+                ),new TypeToken<Watch.Response<V1ConfigMap>>(){}.getType()
         )) {
             for (Watch.Response<V1ConfigMap> item : watch) {
                 // Convert V1ConfigMap to your ConfigMapInfo DTO
@@ -97,6 +108,78 @@ public class K8sService {
             }
         } catch (Exception e) {
             System.err.println("Error watching ConfigMaps: " + e.getMessage());
+            // In production, use a logger to log the error
+        }
+    }
+
+    /**
+     * Watch for Pod events in the "default" namespace and convert them
+     * to PodInfo objects.
+     */
+    public void watchPods(Consumer<Watch.Response<PodInfo>> onEvent) {
+        try (Watch<V1Pod> watch = Watch.createWatch(
+                client,
+                api.listPodForAllNamespacesCall(
+                        null, // pretty
+                        null, // allowWatchBookmarks
+                        null, // _continue
+                        null, // fieldSelector
+                        null, // labelSelector
+                        null, // limit
+                        null, // resourceVersion
+                        null,
+                        60,   // timeoutSeconds
+                        true, // watch
+                        null  // _callback
+                ),new TypeToken<Watch.Response<V1Pod>>(){}.getType()
+        )) {
+            for (Watch.Response<V1Pod> item : watch) {
+                // Convert V1Pod to your PodInfo DTO
+                PodInfo info = PodInfo.fromPod(item.object);
+                // Create a new Watch.Response with the same event type and the DTO
+                Watch.Response<PodInfo> event = new Watch.Response<>(item.type, info);
+                LOGGER.info("Publishing pod event: " + event.type + " for Pod: " + info.getName());
+
+                onEvent.accept(event);
+            }
+        } catch (Exception e) {
+            System.err.println("Error watching Pods: " + e.getMessage());
+            // In production, use a logger to log the error
+        }
+    }
+
+    /**
+     * Watch for Node events in the "default" namespace and convert them
+     * to NodeInfo objects.
+     */
+    public void watchNodes(Consumer<Watch.Response<NodeInfo>> onEvent) {
+        try (Watch<V1Node> watch = Watch.createWatch(
+                client,
+                api.listNodeCall(
+                        null, // pretty
+                        null, // allowWatchBookmarks
+                        null, // _continue
+                        null, // fieldSelector
+                        null, // labelSelector
+                        null, // limit
+                        null, // resourceVersion
+                        null,
+                        60,   // timeoutSeconds
+                        true, // watch
+                        null  // _callback
+                ),new TypeToken<Watch.Response<V1Node>>(){}.getType()
+        )) {
+            for (Watch.Response<V1Node> item : watch) {
+                // Convert V1Node to your NodeInfo DTO
+                NodeInfo info = NodeInfo.fromNode(item.object);
+                // Create a new Watch.Response with the same event type and the DTO
+                Watch.Response<NodeInfo> event = new Watch.Response<>(item.type, info);
+                LOGGER.info("Publishing node event: " + event.type + " for Node: " + info.getName());
+
+                onEvent.accept(event);
+            }
+        } catch (Exception e) {
+            System.err.println("Error watching Nodes: " + e.getMessage());
             // In production, use a logger to log the error
         }
     }

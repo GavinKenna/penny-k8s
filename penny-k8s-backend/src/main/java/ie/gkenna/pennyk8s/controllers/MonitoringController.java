@@ -1,6 +1,8 @@
 package ie.gkenna.pennyk8s.controllers;
 
 import ie.gkenna.pennyk8s.dto.ConfigMapEventDTO;
+import ie.gkenna.pennyk8s.dto.NodeEventDTO;
+import ie.gkenna.pennyk8s.dto.PodEventDTO;
 import ie.gkenna.pennyk8s.services.K8sService;
 import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
@@ -32,24 +34,68 @@ public class MonitoringController {
     public void initWatch() {
         new Thread(() -> {
             while (true) {
-                try {
-                    LOGGER.info("Starting ConfigMap watch...");
-                    k8sService.watchConfigMaps(event -> {
-                        ConfigMapEventDTO dto = new ConfigMapEventDTO(event.type, event.object);
-                        LOGGER.info("Sending ConfigMap event via WebSocket: " + dto.getEventType() + " for " + dto.getConfigMap().getName());
-                        messagingTemplate.convertAndSend("/topic/configmaps", dto);
-                    });
-                    LOGGER.warn("ConfigMap watch exited, restarting...");
-                } catch (Exception e) {
-                    LOGGER.error("Exception in ConfigMap watch thread", e);
-                }
-
-                try {
-                    Thread.sleep(3000); // avoid tight loop on failures
-                } catch (InterruptedException ignored) {
-                }
+                watchConfigMaps();
+                watchNodes();
+                watchPods();
             }
         }, "configmap-watch-thread").start();
+    }
+
+    private void watchConfigMaps() {
+        try {
+            LOGGER.info("Starting ConfigMap watch...");
+            k8sService.watchConfigMaps(event -> {
+                ConfigMapEventDTO dto = new ConfigMapEventDTO(event.type, event.object);
+                LOGGER.info("Sending ConfigMap event via WebSocket: " + dto.getEventType() + " for " + dto.getConfigMap().getName());
+                messagingTemplate.convertAndSend("/topic/configmaps", dto);
+            });
+            LOGGER.warn("ConfigMap watch exited, restarting...");
+        } catch (Exception e) {
+            LOGGER.error("Exception in ConfigMap watch thread", e);
+        }
+
+        try {
+            Thread.sleep(3000); // avoid tight loop on failures
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    private void watchPods() {
+        try {
+            LOGGER.info("Starting Pod watch...");
+            k8sService.watchPods(event -> {
+                PodEventDTO dto = new PodEventDTO(event.type, event.object);
+                LOGGER.info("Sending Pod event via WebSocket: " + dto.getEventType() + " for " + dto.getPod().getName());
+                messagingTemplate.convertAndSend("/topic/pods", dto);
+            });
+            LOGGER.warn("Pod watch exited, restarting...");
+        } catch (Exception e) {
+            LOGGER.error("Exception in Pod watch thread", e);
+        }
+
+        try {
+            Thread.sleep(3000); // avoid tight loop on failures
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    private void watchNodes() {
+        try {
+            LOGGER.info("Starting Node watch...");
+            k8sService.watchNodes(event -> {
+                NodeEventDTO dto = new NodeEventDTO(event.type, event.object);
+                LOGGER.info("Sending Node event via WebSocket: " + dto.getEventType() + " for " + dto.getNode().getName());
+                messagingTemplate.convertAndSend("/topic/nodes", dto);
+            });
+            LOGGER.warn("Node watch exited, restarting...");
+        } catch (Exception e) {
+            LOGGER.error("Exception in Node watch thread", e);
+        }
+
+        try {
+            Thread.sleep(3000); // avoid tight loop on failures
+        } catch (InterruptedException ignored) {
+        }
     }
 
     // Publish nodes and pods updates every 10 seconds (or adjust as needed)
