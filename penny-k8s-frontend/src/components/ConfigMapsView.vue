@@ -45,6 +45,7 @@
       </table>
     </div>
 
+    <!-- ConfigMap Detail Modal -->
     <div
         v-if="selectedConfigMap"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
@@ -54,9 +55,13 @@
             class="absolute top-2 right-2 text-2xl font-bold leading-none text-gray-600 hover:text-gray-800"
             @click="selectedConfigMap = null"
         >&times;</button>
-        <h3 class="text-2xl font-bold mb-4">ConfigMap: {{ selectedConfigMap.name }}</h3>
+        <h3 class="text-2xl font-bold mb-4">
+          ConfigMap: {{ selectedConfigMap.name }}
+        </h3>
         <p class="mb-2"><strong>Namespace:</strong> {{ selectedConfigMap.namespace }}</p>
-        <p class="mb-4"><strong>Created:</strong> {{ formatDate(selectedConfigMap.creationTimestamp) }}</p>
+        <p class="mb-4">
+          <strong>Created:</strong> {{ formatDate(selectedConfigMap.creationTimestamp) }}
+        </p>
         <div v-if="selectedConfigMap.data">
           <h4 class="text-xl font-semibold mb-2">Data:</h4>
           <div
@@ -75,16 +80,28 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchConfigMaps } from '../services/penny-service.js'
+import axios from 'axios'
 import { useK8sRealtime } from '../composables/useK8sRealtime.js'
 
-
-const { pods } = useK8sRealtime()
 const selectedConfigMap = ref(null)
-//
-// onMounted(async () => {
-//   configMaps.value = await fetchConfigMaps()
-// })
+const errorMsg = ref(null)
+
+// Realtime configMaps comes from WebSocket
+const { configMaps } = useK8sRealtime()
+
+// Optional: Load REST version first in case WebSocket is delayed
+onMounted(async () => {
+  try {
+    const response = await axios.get('/api/configmaps')
+    // Only preload if WebSocket hasn't updated anything yet
+    if (configMaps.value.length === 0) {
+      configMaps.value = response.data
+    }
+  } catch (error) {
+    console.error('Error fetching configmaps via REST:', error)
+    errorMsg.value = 'Failed to load configmaps'
+  }
+})
 
 const selectConfigMap = (cm) => {
   selectedConfigMap.value = cm
@@ -103,7 +120,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 0.75rem;
   text-align: left;
   border: 1px solid #e5e7eb;
