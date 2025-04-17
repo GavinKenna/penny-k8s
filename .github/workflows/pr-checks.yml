@@ -35,7 +35,7 @@ jobs:
 
       - name: Lint (Spring Java Format)
         working-directory: penny-k8s-backend
-        run: mvn com.spotify.fmt:fmt-maven-plugin:check
+        run:  mvn spring-javaformat:validate
 
   frontend:
     name: Frontend - Build and Lint
