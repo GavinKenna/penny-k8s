@@ -28,6 +28,7 @@ jobs:
           restore-keys: ${{ runner.os }}-maven
 
       - name: Build with Maven
+        working-directory: penny-k8s-backend
         run: mvn clean install -B
 
       - name: Lint (Spring Java Format)
