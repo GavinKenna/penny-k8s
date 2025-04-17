@@ -17,91 +17,49 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableScheduling
 public class MonitoringController {
 
+    private static final Logger LOGGER = LogManager.getLogger(MonitoringController.class);
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-
     @Autowired
     private K8sService k8sService;
 
-    private static final Logger LOGGER =
-            LogManager.getLogger(MonitoringController.class);
-
-    /**
-     * Use a separate thread to run the watch so it doesn’t block the scheduled tasks.
-     * This method will publish incremental ConfigMap events in real time.
-     */
     @PostConstruct
     public void initWatch() {
         new Thread(() -> {
+
             while (true) {
-                watchConfigMaps();
-                watchNodes();
-                watchPods();
+                runWatch("ConfigMap", "/topic/configmaps", () -> k8sService.watchConfigMaps(event -> messagingTemplate
+                        .convertAndSend("/topic/configmaps", new ConfigMapEventDTO(event.type, event.object))));
+
+                runWatch("Pod", "/topic/pods", () -> k8sService.watchPods(event -> messagingTemplate
+                        .convertAndSend("/topic/pods", new PodEventDTO(event.type, event.object))));
+
+                runWatch("Node", "/topic/nodes", () -> k8sService.watchNodes(event -> messagingTemplate
+                        .convertAndSend("/topic/nodes", new NodeEventDTO(event.type, event.object))));
             }
-        }, "configmap-watch-thread").start();
+
+        }, "k8s-watch-thread").start();
     }
 
-    private void watchConfigMaps() {
+    private void runWatch(String resourceType, String topic, Runnable watchTask) {
         try {
-            LOGGER.info("Starting ConfigMap watch...");
-            k8sService.watchConfigMaps(event -> {
-                ConfigMapEventDTO dto = new ConfigMapEventDTO(event.type, event.object);
-                LOGGER.info("Sending ConfigMap event via WebSocket: " + dto.getEventType() + " for " + dto.getConfigMap().getName());
-                messagingTemplate.convertAndSend("/topic/configmaps", dto);
-            });
-            LOGGER.warn("ConfigMap watch exited, restarting...");
+            LOGGER.info("Starting {} watch...", resourceType);
+            watchTask.run();
+            LOGGER.warn("{} watch exited, restarting...", resourceType);
         } catch (Exception e) {
-            LOGGER.error("Exception in ConfigMap watch thread", e);
+            LOGGER.error("Exception in {} watch thread", resourceType, e);
         }
 
         try {
-            Thread.sleep(3000); // avoid tight loop on failures
+            Thread.sleep(3000);
         } catch (InterruptedException ignored) {
         }
     }
 
-    private void watchPods() {
-        try {
-            LOGGER.info("Starting Pod watch...");
-            k8sService.watchPods(event -> {
-                PodEventDTO dto = new PodEventDTO(event.type, event.object);
-                LOGGER.info("Sending Pod event via WebSocket: " + dto.getEventType() + " for " + dto.getPod().getName());
-                messagingTemplate.convertAndSend("/topic/pods", dto);
-            });
-            LOGGER.warn("Pod watch exited, restarting...");
-        } catch (Exception e) {
-            LOGGER.error("Exception in Pod watch thread", e);
-        }
-
-        try {
-            Thread.sleep(3000); // avoid tight loop on failures
-        } catch (InterruptedException ignored) {
-        }
-    }
-
-    private void watchNodes() {
-        try {
-            LOGGER.info("Starting Node watch...");
-            k8sService.watchNodes(event -> {
-                NodeEventDTO dto = new NodeEventDTO(event.type, event.object);
-                LOGGER.info("Sending Node event via WebSocket: " + dto.getEventType() + " for " + dto.getNode().getName());
-                messagingTemplate.convertAndSend("/topic/nodes", dto);
-            });
-            LOGGER.warn("Node watch exited, restarting...");
-        } catch (Exception e) {
-            LOGGER.error("Exception in Node watch thread", e);
-        }
-
-        try {
-            Thread.sleep(3000); // avoid tight loop on failures
-        } catch (InterruptedException ignored) {
-        }
-    }
-
-    // Publish nodes and pods updates every 10 seconds (or adjust as needed)
     @Scheduled(fixedRate = 10000)
     public void publishNodesAndPods() {
         messagingTemplate.convertAndSend("/topic/nodes", k8sService.getAllNodes());
         messagingTemplate.convertAndSend("/topic/pods", k8sService.getAllPods());
     }
+
 }

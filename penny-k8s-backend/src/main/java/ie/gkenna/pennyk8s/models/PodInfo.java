@@ -6,83 +6,93 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PodInfo {
-    public String name;
-    public String namespace;
-    public String status;
-    public String nodeName;
-    public String podIP;
-    public String startTime;
-    public List<ContainerInfo> containers;
 
-    public static PodInfo fromPod(V1Pod pod) {
-        PodInfo info = new PodInfo();
-        info.name = pod.getMetadata().getName();
-        info.namespace = pod.getMetadata().getNamespace();
-        info.status = pod.getStatus().getPhase();
-        info.nodeName = pod.getSpec().getNodeName();
-        info.podIP = pod.getStatus().getPodIP();
+	public String name;
 
-        info.containers = pod.getSpec().getContainers().stream()
-                .map(ContainerInfo::fromContainer)
-                .collect(Collectors.toList());
+	public String namespace;
 
-        info.startTime = String.valueOf(pod.getStatus().getStartTime());
-        return info;
-    }
+	public String status;
 
-    public String getName() {
-        return name;
-    }
+	public String nodeName;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String podIP;
 
-    public String getNamespace() {
-        return namespace;
-    }
+	public String startTime;
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
+	public List<ContainerInfo> containers;
 
-    public String getStatus() {
-        return status;
-    }
+	public static PodInfo fromPod(V1Pod pod) {
+		PodInfo info = new PodInfo();
+		info.name = pod.getMetadata().getName();
+		info.namespace = pod.getMetadata().getNamespace();
+		info.status = pod.getStatus().getPhase();
+		info.nodeName = pod.getSpec().getNodeName();
+		info.podIP = pod.getStatus().getPodIP();
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+		info.containers = pod.getSpec()
+			.getContainers()
+			.stream()
+			.map(ContainerInfo::fromContainer)
+			.collect(Collectors.toList());
 
-    public String getNodeName() {
-        return nodeName;
-    }
+		info.startTime = String.valueOf(pod.getStatus().getStartTime());
+		return info;
+	}
 
-    public void setNodeName(String nodeName) {
-        this.nodeName = nodeName;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getPodIP() {
-        return podIP;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setPodIP(String podIP) {
-        this.podIP = podIP;
-    }
+	public String getNamespace() {
+		return namespace;
+	}
 
-    public String getStartTime() {
-        return startTime;
-    }
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
+	public String getStatus() {
+		return status;
+	}
 
-    public List<ContainerInfo> getContainers() {
-        return containers;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-    public void setContainers(List<ContainerInfo> containers) {
-        this.containers = containers;
-    }
+	public String getNodeName() {
+		return nodeName;
+	}
+
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
+
+	public String getPodIP() {
+		return podIP;
+	}
+
+	public void setPodIP(String podIP) {
+		this.podIP = podIP;
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public List<ContainerInfo> getContainers() {
+		return containers;
+	}
+
+	public void setContainers(List<ContainerInfo> containers) {
+		this.containers = containers;
+	}
+
 }

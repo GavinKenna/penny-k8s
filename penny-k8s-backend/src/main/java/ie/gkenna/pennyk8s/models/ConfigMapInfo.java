@@ -5,60 +5,65 @@ import io.kubernetes.client.openapi.models.V1ConfigMap;
 import java.util.Map;
 
 public class ConfigMapInfo {
-    private String name;
-    private String namespace;
-    private String creationTimestamp;
-    private java.util.Map<String, String> data;
 
-    // Getters and setters...
+	private String name;
 
-    public static ConfigMapInfo fromV1ConfigMap(V1ConfigMap cm) {
-        ConfigMapInfo info = new ConfigMapInfo();
-        info.setName(cm.getMetadata().getName());
-        info.setNamespace(cm.getMetadata().getNamespace());
-        info.setCreationTimestamp(cm.getMetadata().getCreationTimestamp().toString());
-        info.setData(cm.getData());
-        return info;
-    }
+	private String namespace;
 
-    public String getName() {
-        return name;
-    }
+	private String creationTimestamp;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	private java.util.Map<String, String> data;
 
-    public String getNamespace() {
-        return namespace;
-    }
+	// Getters and setters...
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
+	public static ConfigMapInfo fromV1ConfigMap(V1ConfigMap cm) {
+		ConfigMapInfo info = new ConfigMapInfo();
+		info.setName(cm.getMetadata().getName());
+		info.setNamespace(cm.getMetadata().getNamespace());
+		info.setCreationTimestamp(cm.getMetadata().getCreationTimestamp().toString());
+		info.setData(cm.getData());
+		return info;
+	}
 
-    public String getCreationTimestamp() {
-        return creationTimestamp;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setCreationTimestamp(String creationTimestamp) {
-        this.creationTimestamp = creationTimestamp;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public Map<String, String> getData() {
-        return data;
-    }
+	public String getNamespace() {
+		return namespace;
+	}
 
-    public void setData(Map<String, String> data) {
-        this.data = data;
-    }
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
 
-    public static ConfigMapInfo fromConfigMap(V1ConfigMap configMap) {
-        ConfigMapInfo info = new ConfigMapInfo();
-        info.name = configMap.getMetadata().getName();
-        info.namespace = configMap.getMetadata().getNamespace();
-        info.creationTimestamp = String.valueOf(configMap.getMetadata().getCreationTimestamp());
-        info.data = configMap.getData();
-        return info;
-    }
+	public String getCreationTimestamp() {
+		return creationTimestamp;
+	}
+
+	public void setCreationTimestamp(String creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
+	}
+
+	public Map<String, String> getData() {
+		return data;
+	}
+
+	public void setData(Map<String, String> data) {
+		this.data = data;
+	}
+
+	public static ConfigMapInfo fromConfigMap(V1ConfigMap configMap) {
+		ConfigMapInfo info = new ConfigMapInfo();
+		info.name = configMap.getMetadata().getName();
+		info.namespace = configMap.getMetadata().getNamespace();
+		info.creationTimestamp = String.valueOf(configMap.getMetadata().getCreationTimestamp());
+		info.data = configMap.getData();
+		return info;
+	}
+
 }

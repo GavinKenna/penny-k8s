@@ -6,29 +6,30 @@ import ie.gkenna.pennyk8s.models.NodeInfo;
 import io.kubernetes.client.openapi.models.V1Node;
 
 public class NodeEventDTO {
-    private String eventType;
-    private NodeInfo node;
 
-    public NodeEventDTO(String eventType, NodeInfo node) {
-        this.eventType = eventType;
-        this.node = node;
-    }
+	private String eventType;
 
-    public String getEventType() {
-        return eventType;
-    }
+	private NodeInfo node;
 
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
+	public NodeEventDTO(String eventType, NodeInfo node) {
+		this.eventType = eventType;
+		this.node = node;
+	}
 
-    public NodeInfo getNode() {
-        return node;
-    }
+	public String getEventType() {
+		return eventType;
+	}
 
-    public void setNode(NodeInfo node) {
-        this.node = node;
-    }
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
 
+	public NodeInfo getNode() {
+		return node;
+	}
+
+	public void setNode(NodeInfo node) {
+		this.node = node;
+	}
 
 }
