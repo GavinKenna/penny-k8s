@@ -1,38 +1,34 @@
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from "node:url";
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
-import tailwindcss from "@tailwindcss/vite"
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import vueDevTools from "vite-plugin-vue-devtools";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
   define: {
-    global: 'globalThis'
+    global: "globalThis",
   },
-  plugins: [
-    vue(),
-    vueDevTools(),
-    tailwindcss(),
-  ],
+  plugins: [vue(), vueDevTools(), tailwindcss()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
+      "/api": {
+        target: "http://localhost:8080",
         changeOrigin: true,
         secure: false,
       },
-      '/ws': {
-        target: 'ws://localhost:8080',
+      "/ws": {
+        target: "ws://localhost:8080",
         ws: true,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ws/, '/ws'),
+        rewrite: (path) => path.replace(/^\/ws/, "/ws"),
       },
     },
   },
-})
+});
