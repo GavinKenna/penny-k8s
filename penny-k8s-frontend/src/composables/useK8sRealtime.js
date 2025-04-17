@@ -6,6 +6,7 @@ export function useK8sRealtime() {
   const nodes = ref([]);
   const pods = ref([]);
   const configMaps = ref([]);
+  const deployments = ref([]);
 
   let stompClient = null;
 
@@ -90,6 +91,32 @@ export function useK8sRealtime() {
             console.error("Error parsing configmaps message", e);
           }
         });
+
+        stompClient.subscribe("/topic/deployments", (message) => {
+          try {
+            const event = JSON.parse(message.body);
+
+            if (event.eventType === "ADDED") {
+              if (
+                  !deployments.value.some((cm) => cm.name === event.deployment.name)
+              ) {
+                deployments.value = [...deployments.value, event.deployment];
+              }
+            } else if (event.eventType === "MODIFIED") {
+              deployments.value = deployments.value.map((cm) =>
+                  cm.name === event.deployment.name ? event.deployment : cm,
+              );
+            } else if (event.eventType === "DELETED") {
+              deployments.value = deployments.value.filter(
+                  (cm) => cm.name !== event.deployment.name,
+              );
+            }
+
+            console.log("Updated deployments:", deployments.value);
+          } catch (e) {
+            console.error("Error parsing deployments message", e);
+          }
+        });
       },
       debug: (str) => console.log(str),
     });
@@ -107,5 +134,5 @@ export function useK8sRealtime() {
     }
   });
 
-  return { nodes, pods, configMaps };
+  return { nodes, pods, configMaps, deployments };
 }

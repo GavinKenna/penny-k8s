@@ -16,9 +16,11 @@
 
 package ie.gkenna.pennyk8s.controllers;
 
-import ie.gkenna.pennyk8s.dto.ConfigMapEventDTO;
-import ie.gkenna.pennyk8s.dto.NodeEventDTO;
-import ie.gkenna.pennyk8s.dto.PodEventDTO;
+import ie.gkenna.pennyk8s.dto.ResourceEventDTO;
+import ie.gkenna.pennyk8s.models.ConfigMapInfo;
+import ie.gkenna.pennyk8s.models.DeploymentInfo;
+import ie.gkenna.pennyk8s.models.NodeInfo;
+import ie.gkenna.pennyk8s.models.PodInfo;
 import ie.gkenna.pennyk8s.services.K8sService;
 import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
@@ -48,13 +50,18 @@ public class MonitoringController {
 			while (true) {
 				this.runWatch("ConfigMap", "/topic/configmaps",
 						() -> k8sService.watchConfigMaps(event -> messagingTemplate.convertAndSend("/topic/configmaps",
-								new ConfigMapEventDTO(event.type, event.object))));
+								new ResourceEventDTO<ConfigMapInfo>(event.type, event.object))));
 
 				this.runWatch("Pod", "/topic/pods", () -> k8sService.watchPods(event -> messagingTemplate
-					.convertAndSend("/topic/pods", new PodEventDTO(event.type, event.object))));
+					.convertAndSend("/topic/pods", new ResourceEventDTO<PodInfo>(event.type, event.object))));
 
 				this.runWatch("Node", "/topic/nodes", () -> k8sService.watchNodes(event -> messagingTemplate
-					.convertAndSend("/topic/nodes", new NodeEventDTO(event.type, event.object))));
+					.convertAndSend("/topic/nodes", new ResourceEventDTO<NodeInfo>(event.type, event.object))));
+
+				this.runWatch("Deployment", "/topic/deployments",
+						() -> k8sService
+							.watchDeployments(event -> messagingTemplate.convertAndSend("/topic/deployments",
+									new ResourceEventDTO<DeploymentInfo>(event.type, event.object))));
 			}
 
 		}, "k8s-watch-thread").start();

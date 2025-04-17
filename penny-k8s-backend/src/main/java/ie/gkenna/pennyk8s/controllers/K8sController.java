@@ -17,6 +17,7 @@
 package ie.gkenna.pennyk8s.controllers;
 
 import ie.gkenna.pennyk8s.models.ConfigMapInfo;
+import ie.gkenna.pennyk8s.models.DeploymentInfo;
 import ie.gkenna.pennyk8s.models.NodeInfo;
 import ie.gkenna.pennyk8s.models.PodInfo;
 import ie.gkenna.pennyk8s.services.K8sService;
@@ -50,6 +51,11 @@ public class K8sController {
 	@GetMapping("/configmaps")
 	public List<ConfigMapInfo> getConfigMapInfos() {
 		return this.k8sService.getAllConfigMaps();
+	}
+
+	@GetMapping("/deployments")
+	public List<DeploymentInfo> getDeploymentInfos() {
+		return this.k8sService.getAllDeployments();
 	}
 
 	@GetMapping("/pods/{namespace}/{podName}/logs")

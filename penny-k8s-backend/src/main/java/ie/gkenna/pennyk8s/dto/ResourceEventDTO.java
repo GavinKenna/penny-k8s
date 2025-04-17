@@ -16,17 +16,15 @@
 
 package ie.gkenna.pennyk8s.dto;
 
-import ie.gkenna.pennyk8s.models.NodeInfo;
-
-public class NodeEventDTO {
+public class ResourceEventDTO<T> {
 
 	private String eventType;
 
-	private NodeInfo node;
+	private T resource;
 
-	public NodeEventDTO(String eventType, NodeInfo node) {
+	public ResourceEventDTO(String eventType, T resource) {
 		this.eventType = eventType;
-		this.node = node;
+		this.resource = resource;
 	}
 
 	public String getEventType() {
@@ -37,12 +35,12 @@ public class NodeEventDTO {
 		this.eventType = eventType;
 	}
 
-	public NodeInfo getNode() {
-		return this.node;
+	public T getResource() {
+		return this.resource;
 	}
 
-	public void setNode(NodeInfo node) {
-		this.node = node;
+	public void setResource(T resource) {
+		this.resource = resource;
 	}
 
 }
