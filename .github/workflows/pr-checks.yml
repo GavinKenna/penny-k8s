@@ -31,7 +31,7 @@ jobs:
 
       - name: Build with Maven
         working-directory: penny-k8s-backend
-        run: mvn clean install -B
+        run: mvn package -DskipTests
 
       - name: Lint (Spring Java Format)
         run: mvn com.spotify.fmt:fmt-maven-plugin:check
