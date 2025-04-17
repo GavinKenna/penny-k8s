@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ie.gkenna.pennyk8s.controllers;
 
 import ie.gkenna.pennyk8s.dto.ConfigMapEventDTO;
@@ -30,13 +46,14 @@ public class MonitoringController {
 		new Thread(() -> {
 
 			while (true) {
-				runWatch("ConfigMap", "/topic/configmaps", () -> k8sService.watchConfigMaps(event -> messagingTemplate
-					.convertAndSend("/topic/configmaps", new ConfigMapEventDTO(event.type, event.object))));
+				this.runWatch("ConfigMap", "/topic/configmaps",
+						() -> k8sService.watchConfigMaps(event -> messagingTemplate.convertAndSend("/topic/configmaps",
+								new ConfigMapEventDTO(event.type, event.object))));
 
-				runWatch("Pod", "/topic/pods", () -> k8sService.watchPods(event -> messagingTemplate
+				this.runWatch("Pod", "/topic/pods", () -> k8sService.watchPods(event -> messagingTemplate
 					.convertAndSend("/topic/pods", new PodEventDTO(event.type, event.object))));
 
-				runWatch("Node", "/topic/nodes", () -> k8sService.watchNodes(event -> messagingTemplate
+				this.runWatch("Node", "/topic/nodes", () -> k8sService.watchNodes(event -> messagingTemplate
 					.convertAndSend("/topic/nodes", new NodeEventDTO(event.type, event.object))));
 			}
 
