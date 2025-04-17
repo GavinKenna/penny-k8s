@@ -27,8 +27,9 @@ import { ref } from "vue";
 import PodsView from "./PodsView.vue";
 import NodesView from "./NodesView.vue";
 import ConfigMapsView from "./ConfigMapsView.vue";
+import DeploymentsView from "./DeploymentsView.vue";
 
-const views = ["Pods", "Nodes", "ConfigMaps"];
+const views = ["Pods", "Nodes", "ConfigMaps", "Deployments"];
 const selectedView = ref("Pods");
 
 const getComponentForView = (view) => {
@@ -37,6 +38,8 @@ const getComponentForView = (view) => {
       return NodesView;
     case "ConfigMaps":
       return ConfigMapsView;
+    case "Deployments":
+      return DeploymentsView;
     default:
       return PodsView;
   }

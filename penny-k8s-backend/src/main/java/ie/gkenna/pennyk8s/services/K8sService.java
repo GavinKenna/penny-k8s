@@ -18,13 +18,16 @@ package ie.gkenna.pennyk8s.services;
 
 import com.google.gson.reflect.TypeToken;
 import ie.gkenna.pennyk8s.models.ConfigMapInfo;
+import ie.gkenna.pennyk8s.models.DeploymentInfo;
 import ie.gkenna.pennyk8s.models.NodeInfo;
 import ie.gkenna.pennyk8s.models.PodInfo;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
+import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
+import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1Node;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.util.Config;
@@ -45,19 +48,22 @@ public class K8sService {
 
 	private static final Logger LOGGER = LogManager.getLogger(K8sService.class);
 
-	private final CoreV1Api api;
+	private final CoreV1Api coreV1Api;
+
+	private final AppsV1Api appsV1Api;
 
 	private final ApiClient client;
 
 	public K8sService() throws IOException {
-		this.client = Config.fromCluster();
+		this.client = Config.fromConfig("/home/gkenna/.kube/config");
 		Configuration.setDefaultApiClient(client);
-		this.api = new CoreV1Api(client);
+		this.coreV1Api = new CoreV1Api(client);
+		this.appsV1Api = new AppsV1Api(client);
 	}
 
 	public List<NodeInfo> getAllNodes() {
 		try {
-			return api.listNode(null, null, null, null, null, null, null, null, null, null)
+			return coreV1Api.listNode(null, null, null, null, null, null, null, null, null, null)
 				.getItems()
 				.stream()
 				.map(NodeInfo::fromNode)
@@ -70,7 +76,7 @@ public class K8sService {
 
 	public List<PodInfo> getAllPods() {
 		try {
-			return api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
+			return coreV1Api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
 				.getItems()
 				.stream()
 				.map(PodInfo::fromPod)
@@ -83,7 +89,7 @@ public class K8sService {
 
 	public List<ConfigMapInfo> getAllConfigMaps() {
 		try {
-			return api.listConfigMapForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
+			return coreV1Api.listConfigMapForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
 				.getItems()
 				.stream()
 				.map(ConfigMapInfo::fromConfigMap)
@@ -94,9 +100,23 @@ public class K8sService {
 		}
 	}
 
+	public List<DeploymentInfo> getAllDeployments() {
+		try {
+			return appsV1Api.listDeploymentForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
+					.getItems()
+					.stream()
+					.map(DeploymentInfo::fromDeployment)
+					.collect(Collectors.toList());
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Failed to get Deployments", e);
+		}
+	}
+
 	public String getPodLogs(String namespace, String podName) {
 		try {
-			return api.readNamespacedPodLog(podName, namespace, null, null, null, null, null, null, null, null, null);
+			return coreV1Api.readNamespacedPodLog(podName, namespace, null, null, null, null, null, null, null, null,
+					null);
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to get logs for pod " + podName, e);
@@ -105,9 +125,8 @@ public class K8sService {
 
 	public void watchPods(Consumer<Watch.Response<PodInfo>> onEvent) {
 		try {
-			watchResources(
-					api.listPodForAllNamespacesCall(null, null, null, null, null, null, null, null, 60, true, null),
-					new TypeToken<Watch.Response<V1Pod>>() {
+			watchResources(coreV1Api.listPodForAllNamespacesCall(null, null, null, null, null, null, null, null, 60,
+					true, null), new TypeToken<Watch.Response<V1Pod>>() {
 					}, PodInfo::fromPod, onEvent, "Pod");
 		}
 		catch (ApiException e) {
@@ -117,7 +136,7 @@ public class K8sService {
 
 	public void watchNodes(Consumer<Watch.Response<NodeInfo>> onEvent) {
 		try {
-			watchResources(api.listNodeCall(null, null, null, null, null, null, null, null, 60, true, null),
+			watchResources(coreV1Api.listNodeCall(null, null, null, null, null, null, null, null, 60, true, null),
 					new TypeToken<Watch.Response<V1Node>>() {
 					}, NodeInfo::fromNode, onEvent, "Node");
 		}
@@ -126,10 +145,21 @@ public class K8sService {
 		}
 	}
 
+	public void watchDeployments(Consumer<Watch.Response<DeploymentInfo>> onEvent) {
+		try {
+			watchResources(appsV1Api.listDeploymentForAllNamespacesCall(null, null, null, null, null, null, null, null,
+					60, true, null), new TypeToken<Watch.Response<V1Deployment>>() {
+					}, DeploymentInfo::fromDeployment, onEvent, "Deployment");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void watchConfigMaps(Consumer<Watch.Response<ConfigMapInfo>> onEvent) {
 		try {
-			watchResources(api.listConfigMapForAllNamespacesCall(null, null, null, null, null, null, null, null, 60,
-					true, null), new TypeToken<Watch.Response<V1ConfigMap>>() {
+			watchResources(coreV1Api.listConfigMapForAllNamespacesCall(null, null, null, null, null, null, null, null,
+					60, true, null), new TypeToken<Watch.Response<V1ConfigMap>>() {
 					}, ConfigMapInfo::fromV1ConfigMap, onEvent, "ConfigMap");
 		}
 		catch (ApiException e) {
