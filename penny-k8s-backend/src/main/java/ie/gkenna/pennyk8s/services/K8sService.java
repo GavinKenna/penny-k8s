@@ -103,10 +103,10 @@ public class K8sService {
 	public List<DeploymentInfo> getAllDeployments() {
 		try {
 			return appsV1Api.listDeploymentForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
-					.getItems()
-					.stream()
-					.map(DeploymentInfo::fromDeployment)
-					.collect(Collectors.toList());
+				.getItems()
+				.stream()
+				.map(DeploymentInfo::fromDeployment)
+				.collect(Collectors.toList());
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to get Deployments", e);

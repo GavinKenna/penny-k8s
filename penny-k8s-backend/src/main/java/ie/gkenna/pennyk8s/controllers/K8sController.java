@@ -52,7 +52,7 @@ public class K8sController {
 	public List<ConfigMapInfo> getConfigMapInfos() {
 		return this.k8sService.getAllConfigMaps();
 	}
-	
+
 	@GetMapping("/deployments")
 	public List<DeploymentInfo> getDeploymentInfos() {
 		return this.k8sService.getAllDeployments();
