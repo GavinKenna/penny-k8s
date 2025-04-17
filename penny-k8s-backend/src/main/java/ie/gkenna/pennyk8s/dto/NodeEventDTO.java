@@ -22,9 +22,6 @@ public class NodeEventDTO {
 
 	private String eventType;
 
-
-
-
 	private NodeInfo node;
 
 	public NodeEventDTO(String eventType, NodeInfo node) {
