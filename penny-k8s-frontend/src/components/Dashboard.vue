@@ -5,10 +5,10 @@
       <h1 class="text-xl font-bold text-blue-600 mb-6">Penny K8s Dashboard</h1>
       <nav class="space-y-2">
         <button
-            v-for="view in views"
-            :key="view"
-            @click="selectedView = view"
-            :class="buttonClass(view)"
+          v-for="view in views"
+          :key="view"
+          @click="selectedView = view"
+          :class="buttonClass(view)"
         >
           {{ view }}
         </button>
@@ -23,31 +23,33 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
-import PodsView from './PodsView.vue'
-import NodesView from './NodesView.vue'
-import ConfigMapsView from './ConfigMapsView.vue'
+import { ref } from "vue";
+import PodsView from "./PodsView.vue";
+import NodesView from "./NodesView.vue";
+import ConfigMapsView from "./ConfigMapsView.vue";
 
-const views = ['Pods', 'Nodes', 'ConfigMaps']
-const selectedView = ref('Pods')
+const views = ["Pods", "Nodes", "ConfigMaps"];
+const selectedView = ref("Pods");
 
 const getComponentForView = (view) => {
   switch (view) {
-    case 'Nodes':
-      return NodesView
-    case 'ConfigMaps':
-      return ConfigMapsView
+    case "Nodes":
+      return NodesView;
+    case "ConfigMaps":
+      return ConfigMapsView;
     default:
-      return PodsView
+      return PodsView;
   }
-}
+};
 
 const buttonClass = (view) => {
   return [
-    'w-full text-left px-3 py-2 rounded hover:bg-blue-100 transition',
-    selectedView.value === view ? 'bg-blue-500 text-white font-semibold' : 'text-gray-700'
-  ]
-}
+    "w-full text-left px-3 py-2 rounded hover:bg-blue-100 transition",
+    selectedView.value === view
+      ? "bg-blue-500 text-white font-semibold"
+      : "text-gray-700",
+  ];
+};
 </script>
 
 <style scoped>

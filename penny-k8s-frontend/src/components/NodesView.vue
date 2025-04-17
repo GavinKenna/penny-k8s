@@ -6,14 +6,19 @@
 
     <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <div
-          v-for="node in nodes"
-          :key="node.name"
-          class="bg-white p-6 rounded-2xl shadow-md"
+        v-for="node in nodes"
+        :key="node.name"
+        class="bg-white p-6 rounded-2xl shadow-md"
       >
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ node.name }}</h3>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">
+          {{ node.name }}
+        </h3>
         <p><strong>Role:</strong> {{ node.role }}</p>
-        <p><strong>Status:</strong>
-          <span :class="node.status === 'Ready' ? 'text-green-600' : 'text-red-600'">
+        <p>
+          <strong>Status:</strong>
+          <span
+            :class="node.status === 'Ready' ? 'text-green-600' : 'text-red-600'"
+          >
             {{ node.status }}
           </span>
         </p>
@@ -25,12 +30,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { fetchNodes } from '../services/penny-service.js'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useK8sRealtime } from "../composables/useK8sRealtime.js";
 
-const nodes = ref([])
+const selectedNode = ref(null);
+const errorMsg = ref(null);
 
+// Realtime Nodes comes from WebSocket
+const { nodes } = useK8sRealtime();
+
+// Optional: Load REST version first in case WebSocket is delayed
 onMounted(async () => {
-  nodes.value = await fetchNodes()
-})
+  try {
+    const response = await axios.get("/api/nodes");
+    // Only preload if WebSocket hasn't updated anything yet
+    if (nodes.value.length === 0) {
+      nodes.value = response.data;
+    }
+  } catch (error) {
+    console.error("Error fetching Nodes via REST:", error);
+    errorMsg.value = "Failed to load Nodes";
+  }
+});
+
+const selectNode = (cm) => {
+  selectedNode.value = cm;
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return "N/A";
+  const d = new Date(dateStr);
+  return d.toLocaleString();
+};
 </script>

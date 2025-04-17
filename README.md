@@ -75,3 +75,6 @@ The frontend fetches data from the backend on page load using Axios.
 It displays the nodes and their pods in a collapsible, expandable format.
 
 The searchTerm input allows users to filter pods by name, and the tabs filter by node type.
+
+# Authors
+Gavin Kenna
