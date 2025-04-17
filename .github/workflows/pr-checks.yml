@@ -1,0 +1,69 @@
+name: PR Checks
+# add comment to kick this off
+on:
+  pull_request:
+    branches:
+      - master
+      - 'release/**'
+
+jobs:
+  backend:
+    name: Backend - Build and Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven
+
+      - name: Build with Maven
+        working-directory: penny-k8s-backend
+        run: mvn clean install -B
+
+      - name: Lint (Spring Java Format)
+        run: mvn com.spotify.fmt:fmt-maven-plugin:check
+
+  frontend:
+    name: Frontend - Build and Lint
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: penny-k8s-frontend
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            penny-k8s-frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('penny-k8s-frontend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
