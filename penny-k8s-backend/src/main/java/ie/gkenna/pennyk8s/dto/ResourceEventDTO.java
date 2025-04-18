@@ -14,21 +14,33 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s;
+package ie.gkenna.pennyk8s.dto;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+public class ResourceEventDTO<T> {
 
-@Configuration
-public class WebConfig implements WebMvcConfigurer {
+	private String eventType;
 
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-			.allowedOrigins("*")
-			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-			.allowedHeaders("*");
+	private T resource;
+
+	public ResourceEventDTO(String eventType, T resource) {
+		this.eventType = eventType;
+		this.resource = resource;
+	}
+
+	public String getEventType() {
+		return this.eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+
+	public T getResource() {
+		return this.resource;
+	}
+
+	public void setResource(T resource) {
+		this.resource = resource;
 	}
 
 }

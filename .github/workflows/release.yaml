@@ -1,0 +1,140 @@
+name: Release and Tag
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare-version:
+    name: Extract and Prepare Version
+    runs-on: ubuntu-latest
+    outputs:
+      release-version: ${{ steps.set-version.outputs.release-version }}
+      next-snapshot: ${{ steps.set-version.outputs.next-snapshot }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Extract Version from Maven pom.xml
+        id: set-version
+        run: |
+          VERSION=$(xmllint --xpath "/*[local-name()='project']/*[local-name()='version']/text()" penny-k8s-backend/pom.xml)
+          echo "Current Maven version: $VERSION"
+
+          # Strip '-SNAPSHOT' to get release version
+          RELEASE_VERSION="${VERSION/-SNAPSHOT/}"
+
+          # Increment patch for next snapshot version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${RELEASE_VERSION}"
+          NEXT_PATCH=$((PATCH + 1))
+          NEXT_SNAPSHOT="$MAJOR.$MINOR.$NEXT_PATCH-SNAPSHOT"
+
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+          echo "NEXT_SNAPSHOT=$NEXT_SNAPSHOT" >> $GITHUB_OUTPUT
+
+  release:
+    name: Build, Push, and Release
+    needs: prepare-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set lowercase repo owner
+        run: echo "REPO_OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Update Maven Version to Release Version
+        run: |
+          mvn --file penny-k8s-backend/pom.xml versions:set -DnewVersion=${{ needs.prepare-version.outputs.release-version }}
+          mvn --file penny-k8s-backend/pom.xml versions:commit
+
+      - name: Update Frontend Version in package.json
+        run: |
+          jq '.version = "${{ needs.prepare-version.outputs.release-version }}"' penny-k8s-frontend/package.json > tmp && mv tmp penny-k8s-frontend/package.json
+
+      - name: Build Backend
+        working-directory: penny-k8s-backend
+        run: mvn clean package -DskipTests
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Build Frontend
+        working-directory: penny-k8s-frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and Push Backend Image
+        working-directory: penny-k8s-backend
+        run: |
+          docker build -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ needs.prepare-version.outputs.release-version }} .
+          docker push ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ needs.prepare-version.outputs.release-version }}
+
+      - name: Build and Push Frontend Image
+        working-directory: penny-k8s-frontend
+        run: |
+          docker build -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ needs.prepare-version.outputs.release-version }} .
+          docker push ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-frontend:${{ needs.prepare-version.outputs.release-version }}
+
+      - name: Commit and Tag Release
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "Release version ${{ needs.prepare-version.outputs.release-version }}"
+          git tag ${{ needs.prepare-version.outputs.release-version }}
+          git push origin HEAD
+          git push origin ${{ needs.prepare-version.outputs.release-version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare-version.outputs.release-version }}
+          name: Release ${{ needs.prepare-version.outputs.release-version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  bump-snapshot:
+    name: Bump to Next Snapshot
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set Next Snapshot Version in Backend
+        run: |
+          mvn --file penny-k8s-backend/pom.xml versions:set -DnewVersion=${{ needs.prepare-version.outputs.next-snapshot }}
+          mvn --file penny-k8s-backend/pom.xml versions:commit
+
+      - name: Set Next Snapshot Version in Frontend
+        run: |
+          jq '.version = "${{ needs.prepare-version.outputs.next-snapshot }}"' penny-k8s-frontend/package.json > tmp && mv tmp penny-k8s-frontend/package.json
+
+      - name: Commit and Push Next Snapshot Version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "Set version to ${{ needs.prepare-version.outputs.next-snapshot }}"
+          git push origin HEAD
