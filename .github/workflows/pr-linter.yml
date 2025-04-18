@@ -37,11 +37,7 @@ jobs:
       - name: Format code (Spring Java Format)
         working-directory: penny-k8s-backend
         run: mvn spring-javaformat:apply
-
-      - name: Build with Maven
-        working-directory: penny-k8s-backend
-        run: mvn package -DskipTests
-
+        
       - name: Commit formatted code if needed
         working-directory: penny-k8s-backend
         run: |
