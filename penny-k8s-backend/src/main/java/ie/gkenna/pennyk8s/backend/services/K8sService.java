@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.services;
+package ie.gkenna.pennyk8s.backend.services;
 
 import com.google.gson.reflect.TypeToken;
-import ie.gkenna.pennyk8s.models.ConfigMapInfo;
-import ie.gkenna.pennyk8s.models.DeploymentInfo;
-import ie.gkenna.pennyk8s.models.NodeInfo;
-import ie.gkenna.pennyk8s.models.PodInfo;
+import ie.gkenna.pennyk8s.backend.models.ConfigMapInfo;
+import ie.gkenna.pennyk8s.backend.models.DeploymentInfo;
+import ie.gkenna.pennyk8s.backend.models.NodeInfo;
+import ie.gkenna.pennyk8s.backend.models.PodInfo;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;

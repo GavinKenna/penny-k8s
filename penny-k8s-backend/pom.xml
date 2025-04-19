@@ -7,11 +7,10 @@
 		<artifactId>penny-k8s-parent</artifactId>
 		<version>0.2.0-SNAPSHOT</version>
 	</parent>
-	<groupId>ie.gkenna</groupId>
 	<artifactId>penny-k8s-backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>penny-k8s-backend</name>
 	<description>penny-k8s-backend</description>
+	<packaging>jar</packaging>
 	<url/>
 	<licenses>
 		<license/>
@@ -48,7 +47,7 @@
 		<dependency>
 			<groupId>io.kubernetes</groupId>
 			<artifactId>client-java</artifactId>
-			<version>18.0.0</version> <!-- Match your k8s version -->
+			<version>18.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -64,50 +63,43 @@
 
 	<build>
 		<plugins>
+			<!-- Standard thin JAR -->
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<!-- code formatter -->
-			<plugin>
-				<groupId>io.spring.javaformat</groupId>
-				<artifactId>spring-javaformat-maven-plugin</artifactId>
-				<version>0.0.43</version>  <!-- use latest release -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.4.2</version>
 				<executions>
 					<execution>
-						<id>format-validate</id>
-						<phase>validate</phase>
+						<id>default-jar</id>
+						<phase>package</phase>
 						<goals>
-							<goal>validate</goal>
+							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-			<!-- checkstyle using Spring’s rules -->
+
+			<!-- Fat JAR with classifier -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.3.0</version>
-				<dependencies>
-					<!-- Spring’s Checkstyle module -->
-					<dependency>
-						<groupId>io.spring.javaformat</groupId>
-						<artifactId>spring-javaformat-checkstyle</artifactId>
-						<version>0.0.43</version>
-					</dependency>
-				</dependencies>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.1.4</version>
+
+				<configuration>
+					<classifier>boot</classifier>
+					<attach>true</attach>
+				</configuration>
+
+				<!-- seperate fat jar for dockerfile -->
 				<executions>
 					<execution>
-						<id>checkstyle-validation</id>
-						<phase>validate</phase>
+						<id>repackage-fat-jar</id>
 						<goals>
-							<goal>check</goal>
+							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<!-- point at Spring’s bundled rules -->
-							<configLocation>io/spring/javaformat/checkstyle/checkstyle.xml</configLocation>
-							<includeTestSourceDirectory>true</includeTestSourceDirectory>
-							<failOnViolation>false</failOnViolation>
+							<classifier>boot</classifier>
+							<attach>true</attach>
 						</configuration>
 					</execution>
 				</executions>

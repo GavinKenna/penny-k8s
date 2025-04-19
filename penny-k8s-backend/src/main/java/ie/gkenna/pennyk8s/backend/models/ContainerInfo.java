@@ -14,33 +14,27 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.dto;
+package ie.gkenna.pennyk8s.backend.models;
 
-public class ResourceEventDTO<T> {
+import io.kubernetes.client.openapi.models.V1Container;
 
-	private String eventType;
+import java.util.List;
 
-	private T resource;
+public class ContainerInfo {
 
-	public ResourceEventDTO(String eventType, T resource) {
-		this.eventType = eventType;
-		this.resource = resource;
+	public String name;
+
+	public String image;
+
+	public static List<ContainerInfo> transform(List<V1Container> containers) {
+		return null;
 	}
 
-	public String getEventType() {
-		return this.eventType;
-	}
-
-	public void setEventType(String eventType) {
-		this.eventType = eventType;
-	}
-
-	public T getResource() {
-		return this.resource;
-	}
-
-	public void setResource(T resource) {
-		this.resource = resource;
+	public static ContainerInfo fromContainer(V1Container container) {
+		ContainerInfo info = new ContainerInfo();
+		info.name = container.getName();
+		info.image = container.getImage();
+		return info;
 	}
 
 }

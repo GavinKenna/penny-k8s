@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.controllers;
+package ie.gkenna.pennyk8s.backend.controllers;
 
-import ie.gkenna.pennyk8s.dto.ResourceEventDTO;
-import ie.gkenna.pennyk8s.models.ConfigMapInfo;
-import ie.gkenna.pennyk8s.models.DeploymentInfo;
-import ie.gkenna.pennyk8s.models.NodeInfo;
-import ie.gkenna.pennyk8s.models.PodInfo;
-import ie.gkenna.pennyk8s.services.K8sService;
+import ie.gkenna.pennyk8s.backend.dto.ResourceEventDTO;
+import ie.gkenna.pennyk8s.backend.models.ConfigMapInfo;
+import ie.gkenna.pennyk8s.backend.models.DeploymentInfo;
+import ie.gkenna.pennyk8s.backend.models.NodeInfo;
+import ie.gkenna.pennyk8s.backend.models.PodInfo;
+import ie.gkenna.pennyk8s.backend.services.K8sService;
 import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

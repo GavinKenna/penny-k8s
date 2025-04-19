@@ -14,18 +14,33 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s;
+package ie.gkenna.pennyk8s.backend.dto;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
+public class ResourceEventDTO<T> {
 
-@SpringBootApplication
-@EnableScheduling
-public class PennyK8sApplication {
+	private String eventType;
 
-	public static void main(String[] args) {
-		SpringApplication.run(PennyK8sApplication.class, args);
+	private T resource;
+
+	public ResourceEventDTO(String eventType, T resource) {
+		this.eventType = eventType;
+		this.resource = resource;
+	}
+
+	public String getEventType() {
+		return this.eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+
+	public T getResource() {
+		return this.resource;
+	}
+
+	public void setResource(T resource) {
+		this.resource = resource;
 	}
 
 }

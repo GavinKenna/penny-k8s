@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.models;
+package ie.gkenna.pennyk8s.backend.models;
 
 import java.util.Map;
 

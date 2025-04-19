@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.models;
+package ie.gkenna.pennyk8s.backend;
 
-import io.kubernetes.client.openapi.models.V1Container;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
 
-public class ContainerInfo {
-
-	public String name;
-
-	public String image;
-
-	public static List<ContainerInfo> transform(List<V1Container> containers) {
-		return null;
-	}
-
-	public static ContainerInfo fromContainer(V1Container container) {
-		ContainerInfo info = new ContainerInfo();
-		info.name = container.getName();
-		info.image = container.getImage();
-		return info;
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+			.allowedOrigins("*")
+			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+			.allowedHeaders("*");
 	}
 
 }
