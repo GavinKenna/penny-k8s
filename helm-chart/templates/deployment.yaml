@@ -27,6 +27,11 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+        env:
+          - name: K8S_USEINCLUSTERCONFIG
+            value: "{{ .Values.k8s.useInClusterConfig }}"
+          - name: K8S_KUBECONFIGPATH
+            value: "{{ .Values.k8s.kubeConfigPath }}"
       - name: penny-k8s-frontend
         image: 192.168.88.23:5000/penny-k8s-frontend:latest
         ports:

@@ -1,5 +1,7 @@
 # Penny K8s Dashboard
 
+![Logo](./assets/penny-k8s.png)
+
 Penny K8s Dashboard is a web application that provides an overview of the nodes and pods in a Kubernetes cluster. The backend retrieves Kubernetes cluster information and exposes it via REST APIs, while the frontend displays this information through an interactive Vue.js dashboard.
 
 ## Features

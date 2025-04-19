@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: penny-k8s
+server:
+  port: 8080
+  address: 0.0.0.0
+
+# default to desktop mode
+k8s:
+  useInClusterConfig: ${K8S_USEINCLUSTERCONFIG:false}
+  kubeConfigPath: ${K8S_KUBECONFIGPATH:${user.home}/.kube/config}

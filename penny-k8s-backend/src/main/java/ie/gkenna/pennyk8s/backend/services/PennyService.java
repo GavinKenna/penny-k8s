@@ -35,6 +35,7 @@ import io.kubernetes.client.util.Watch;
 import okhttp3.Call;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -44,9 +45,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class K8sService {
+public class PennyService {
 
-	private static final Logger LOGGER = LogManager.getLogger(K8sService.class);
+	private static final Logger LOGGER = LogManager.getLogger(PennyService.class);
 
 	private final CoreV1Api coreV1Api;
 
@@ -54,8 +55,17 @@ public class K8sService {
 
 	private final ApiClient client;
 
-	public K8sService() throws IOException {
-		this.client = Config.fromConfig("/home/gkenna/.kube/config");
+	public PennyService(
+			@Value("${k8s.useInClusterConfig}") boolean useInClusterConfig,
+			@Value("${k8s.kubeConfigPath}") String kubeConfigPath
+	) throws IOException {
+		if (useInClusterConfig) {
+			// when running inside Kubernetes via Helm
+			client = Config.fromCluster();
+		} else {
+			// when running desktop or testing locally
+			client = Config.fromConfig(kubeConfigPath);
+		}
 		Configuration.setDefaultApiClient(client);
 		this.coreV1Api = new CoreV1Api(client);
 		this.appsV1Api = new AppsV1Api(client);

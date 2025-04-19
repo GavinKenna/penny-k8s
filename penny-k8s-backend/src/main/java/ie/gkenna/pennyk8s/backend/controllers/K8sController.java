@@ -20,7 +20,7 @@ import ie.gkenna.pennyk8s.backend.models.ConfigMapInfo;
 import ie.gkenna.pennyk8s.backend.models.DeploymentInfo;
 import ie.gkenna.pennyk8s.backend.models.NodeInfo;
 import ie.gkenna.pennyk8s.backend.models.PodInfo;
-import ie.gkenna.pennyk8s.backend.services.K8sService;
+import ie.gkenna.pennyk8s.backend.services.PennyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,35 +32,35 @@ import java.util.List;
 @RequestMapping("/api")
 public class K8sController {
 
-	private final K8sService k8sService;
+	private final PennyService pennyService;
 
-	public K8sController(K8sService k8sService) {
-		this.k8sService = k8sService;
+	public K8sController(PennyService pennyService) {
+		this.pennyService = pennyService;
 	}
 
 	@GetMapping("/nodes")
 	public List<NodeInfo> getNodes() {
-		return this.k8sService.getAllNodes();
+		return this.pennyService.getAllNodes();
 	}
 
 	@GetMapping("/pods")
 	public List<PodInfo> getPods() {
-		return this.k8sService.getAllPods();
+		return this.pennyService.getAllPods();
 	}
 
 	@GetMapping("/configmaps")
 	public List<ConfigMapInfo> getConfigMapInfos() {
-		return this.k8sService.getAllConfigMaps();
+		return this.pennyService.getAllConfigMaps();
 	}
 
 	@GetMapping("/deployments")
 	public List<DeploymentInfo> getDeploymentInfos() {
-		return this.k8sService.getAllDeployments();
+		return this.pennyService.getAllDeployments();
 	}
 
 	@GetMapping("/pods/{namespace}/{podName}/logs")
 	public String getPodLogs(@PathVariable String namespace, @PathVariable String podName) {
-		return this.k8sService.getPodLogs(namespace, podName);
+		return this.pennyService.getPodLogs(namespace, podName);
 	}
 
 }

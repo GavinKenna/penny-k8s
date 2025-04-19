@@ -6,3 +6,7 @@ image:
 namespace: penny-k8s
 
 installClusterRole: true
+
+k8s:
+  useInClusterConfig: true
+  kubeConfigPath: ""

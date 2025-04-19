@@ -3,6 +3,7 @@ package ie.gkenna.pennyk8s.desktop;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -37,6 +38,10 @@ public class PennyDesktopLauncher extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Penny K8s Dashboard");
+
+        primaryStage.getIcons().add(
+                new Image(getClass().getResourceAsStream("/pennyK8s.png"))
+        );
 
         WebView webView = new WebView();
         WebEngine webEngine = webView.getEngine();
