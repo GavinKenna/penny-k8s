@@ -98,17 +98,19 @@ export function useK8sRealtime() {
 
             if (event.eventType === "ADDED") {
               if (
-                  !deployments.value.some((cm) => cm.name === event.deployment.name)
+                !deployments.value.some(
+                  (cm) => cm.name === event.deployment.name,
+                )
               ) {
                 deployments.value = [...deployments.value, event.deployment];
               }
             } else if (event.eventType === "MODIFIED") {
               deployments.value = deployments.value.map((cm) =>
-                  cm.name === event.deployment.name ? event.deployment : cm,
+                cm.name === event.deployment.name ? event.deployment : cm,
               );
             } else if (event.eventType === "DELETED") {
               deployments.value = deployments.value.filter(
-                  (cm) => cm.name !== event.deployment.name,
+                (cm) => cm.name !== event.deployment.name,
               );
             }
 

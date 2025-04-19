@@ -3,16 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>ie.gkenna.pennyk8s</groupId>
+		<artifactId>penny-k8s-parent</artifactId>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
-	<groupId>ie.gkenna</groupId>
 	<artifactId>penny-k8s-backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>penny-k8s-backend</name>
 	<description>penny-k8s-backend</description>
+	<packaging>jar</packaging>
 	<url/>
 	<licenses>
 		<license/>
@@ -49,7 +47,7 @@
 		<dependency>
 			<groupId>io.kubernetes</groupId>
 			<artifactId>client-java</artifactId>
-			<version>18.0.0</version> <!-- Match your k8s version -->
+			<version>18.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -65,11 +63,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<!-- code formatter -->
 			<plugin>
 				<groupId>io.spring.javaformat</groupId>
 				<artifactId>spring-javaformat-maven-plugin</artifactId>
@@ -109,6 +102,47 @@
 							<configLocation>io/spring/javaformat/checkstyle/checkstyle.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<failOnViolation>false</failOnViolation>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Standard thin JAR -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.4.2</version>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Fat JAR with classifier -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.1.4</version>
+
+				<configuration>
+					<classifier>boot</classifier>
+					<attach>true</attach>
+				</configuration>
+
+				<!-- seperate fat jar for dockerfile -->
+				<executions>
+					<execution>
+						<id>repackage-fat-jar</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<classifier>boot</classifier>
+							<attach>true</attach>
 						</configuration>
 					</execution>
 				</executions>

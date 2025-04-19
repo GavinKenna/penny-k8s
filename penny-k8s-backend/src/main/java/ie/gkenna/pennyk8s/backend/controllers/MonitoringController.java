@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.controllers;
+package ie.gkenna.pennyk8s.backend.controllers;
 
-import ie.gkenna.pennyk8s.dto.ResourceEventDTO;
-import ie.gkenna.pennyk8s.models.ConfigMapInfo;
-import ie.gkenna.pennyk8s.models.DeploymentInfo;
-import ie.gkenna.pennyk8s.models.NodeInfo;
-import ie.gkenna.pennyk8s.models.PodInfo;
-import ie.gkenna.pennyk8s.services.K8sService;
+import ie.gkenna.pennyk8s.backend.dto.ResourceEventDTO;
+import ie.gkenna.pennyk8s.backend.models.ConfigMapInfo;
+import ie.gkenna.pennyk8s.backend.models.DeploymentInfo;
+import ie.gkenna.pennyk8s.backend.models.NodeInfo;
+import ie.gkenna.pennyk8s.backend.models.PodInfo;
+import ie.gkenna.pennyk8s.backend.services.PennyService;
 import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +41,7 @@ public class MonitoringController {
 	private SimpMessagingTemplate messagingTemplate;
 
 	@Autowired
-	private K8sService k8sService;
+	private PennyService pennyService;
 
 	@PostConstruct
 	public void initWatch() {
@@ -49,17 +49,18 @@ public class MonitoringController {
 
 			while (true) {
 				this.runWatch("ConfigMap", "/topic/configmaps",
-						() -> k8sService.watchConfigMaps(event -> messagingTemplate.convertAndSend("/topic/configmaps",
-								new ResourceEventDTO<ConfigMapInfo>(event.type, event.object))));
+						() -> pennyService
+							.watchConfigMaps(event -> messagingTemplate.convertAndSend("/topic/configmaps",
+									new ResourceEventDTO<ConfigMapInfo>(event.type, event.object))));
 
-				this.runWatch("Pod", "/topic/pods", () -> k8sService.watchPods(event -> messagingTemplate
+				this.runWatch("Pod", "/topic/pods", () -> pennyService.watchPods(event -> messagingTemplate
 					.convertAndSend("/topic/pods", new ResourceEventDTO<PodInfo>(event.type, event.object))));
 
-				this.runWatch("Node", "/topic/nodes", () -> k8sService.watchNodes(event -> messagingTemplate
+				this.runWatch("Node", "/topic/nodes", () -> pennyService.watchNodes(event -> messagingTemplate
 					.convertAndSend("/topic/nodes", new ResourceEventDTO<NodeInfo>(event.type, event.object))));
 
 				this.runWatch("Deployment", "/topic/deployments",
-						() -> k8sService
+						() -> pennyService
 							.watchDeployments(event -> messagingTemplate.convertAndSend("/topic/deployments",
 									new ResourceEventDTO<DeploymentInfo>(event.type, event.object))));
 			}
@@ -86,8 +87,8 @@ public class MonitoringController {
 
 	@Scheduled(fixedRate = 10000)
 	public void publishNodesAndPods() {
-		messagingTemplate.convertAndSend("/topic/nodes", k8sService.getAllNodes());
-		messagingTemplate.convertAndSend("/topic/pods", k8sService.getAllPods());
+		messagingTemplate.convertAndSend("/topic/nodes", pennyService.getAllNodes());
+		messagingTemplate.convertAndSend("/topic/pods", pennyService.getAllPods());
 	}
 
 }

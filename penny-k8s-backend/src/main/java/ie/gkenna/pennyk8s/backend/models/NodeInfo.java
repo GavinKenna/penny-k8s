@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.models;
+package ie.gkenna.pennyk8s.backend.models;
 
 import io.kubernetes.client.custom.Quantity;
 import io.kubernetes.client.openapi.models.V1Node;

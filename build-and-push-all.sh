@@ -1,4 +1,4 @@
-cd backend
+cd penny-k8s-backend
 
 bash docker-build-and-push.sh
 

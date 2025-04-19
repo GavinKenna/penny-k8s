@@ -25,7 +25,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the built JAR file from the previous stage
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/penny-k8s-backend-0.2.0-SNAPSHOT-boot.jar app.jar
 
 EXPOSE 8080
 

@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+           http://maven.apache.org/POM/4.0.0
+           https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ie.gkenna.pennyk8s</groupId>
+    <artifactId>penny-k8s-parent</artifactId>
+    <version>0.2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Penny K8s All‑in‑One</name>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.4</version>
+        <relativePath/>
+    </parent>
+
+    <dependencyManagement>
+    </dependencyManagement>
+    <build>
+        <pluginManagement>
+        </pluginManagement>
+    </build>
+
+    <modules>
+        <module>penny-k8s-backend</module>
+        <module>penny-k8s-frontend</module>
+        <module>penny-k8s-desktop</module>
+    </modules>
+</project>

@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s;
+package ie.gkenna.pennyk8s.backend;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@Configuration
-public class WebConfig implements WebMvcConfigurer {
+@SpringBootApplication
+@EnableScheduling
+public class PennyK8sApplication {
 
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-			.allowedOrigins("*")
-			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-			.allowedHeaders("*");
+	public static void main(String[] args) {
+		SpringApplication.run(PennyK8sApplication.class, args);
 	}
 
 }

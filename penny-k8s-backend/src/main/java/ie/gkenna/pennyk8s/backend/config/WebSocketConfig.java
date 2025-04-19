@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ie.gkenna.pennyk8s.config;
+package ie.gkenna.pennyk8s.backend.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
