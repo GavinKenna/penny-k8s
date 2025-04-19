@@ -17,10 +17,7 @@
 package ie.gkenna.pennyk8s.backend.controllers;
 
 import ie.gkenna.pennyk8s.backend.dto.ResourceEventDTO;
-import ie.gkenna.pennyk8s.backend.models.ConfigMapInfo;
-import ie.gkenna.pennyk8s.backend.models.DeploymentInfo;
-import ie.gkenna.pennyk8s.backend.models.NodeInfo;
-import ie.gkenna.pennyk8s.backend.models.PodInfo;
+import ie.gkenna.pennyk8s.backend.models.*;
 import ie.gkenna.pennyk8s.backend.services.PennyService;
 import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
@@ -63,6 +60,11 @@ public class MonitoringController {
 						() -> pennyService
 							.watchDeployments(event -> messagingTemplate.convertAndSend("/topic/deployments",
 									new ResourceEventDTO<DeploymentInfo>(event.type, event.object))));
+
+				this.runWatch("Namespace", "/topic/namespaces",
+						() -> pennyService
+								.watchNamespaces(event -> messagingTemplate.convertAndSend("/topic/namespaces",
+										new ResourceEventDTO<NamespaceInfo>(event.type, event.object))));
 			}
 
 		}, "k8s-watch-thread").start();
