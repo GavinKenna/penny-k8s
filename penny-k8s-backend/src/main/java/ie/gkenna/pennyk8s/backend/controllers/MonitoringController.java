@@ -49,8 +49,9 @@ public class MonitoringController {
 
 			while (true) {
 				this.runWatch("ConfigMap", "/topic/configmaps",
-						() -> pennyService.watchConfigMaps(event -> messagingTemplate.convertAndSend("/topic/configmaps",
-								new ResourceEventDTO<ConfigMapInfo>(event.type, event.object))));
+						() -> pennyService
+							.watchConfigMaps(event -> messagingTemplate.convertAndSend("/topic/configmaps",
+									new ResourceEventDTO<ConfigMapInfo>(event.type, event.object))));
 
 				this.runWatch("Pod", "/topic/pods", () -> pennyService.watchPods(event -> messagingTemplate
 					.convertAndSend("/topic/pods", new ResourceEventDTO<PodInfo>(event.type, event.object))));

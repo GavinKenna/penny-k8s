@@ -55,14 +55,13 @@ public class PennyService {
 
 	private final ApiClient client;
 
-	public PennyService(
-			@Value("${k8s.useInClusterConfig}") boolean useInClusterConfig,
-			@Value("${k8s.kubeConfigPath}") String kubeConfigPath
-	) throws IOException {
+	public PennyService(@Value("${k8s.useInClusterConfig}") boolean useInClusterConfig,
+			@Value("${k8s.kubeConfigPath}") String kubeConfigPath) throws IOException {
 		if (useInClusterConfig) {
 			// when running inside Kubernetes via Helm
 			client = Config.fromCluster();
-		} else {
+		}
+		else {
 			// when running desktop or testing locally
 			client = Config.fromConfig(kubeConfigPath);
 		}
