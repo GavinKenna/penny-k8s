@@ -20,42 +20,43 @@ import io.kubernetes.client.openapi.models.V1Service;
 
 public class ServiceInfo {
 
-    public String name;
-    public String namespace;
-    public String type;
+	public String name;
 
-    public static ServiceInfo fromService(V1Service service) {
-        ServiceInfo info = new ServiceInfo();
-        info.name = service.getMetadata().getName();
-        info.namespace = service.getMetadata().getNamespace();
-        info.type = service.getSpec().getType();
+	public String namespace;
 
-        return info;
-    }
+	public String type;
 
-    public String getName() {
-        return name;
-    }
+	public static ServiceInfo fromService(V1Service service) {
+		ServiceInfo info = new ServiceInfo();
+		info.name = service.getMetadata().getName();
+		info.namespace = service.getMetadata().getNamespace();
+		info.type = service.getSpec().getType();
 
-    public void setName(String name) {
-        this.name = name;
-    }
+		return info;
+	}
 
-    public String getNamespace() {
-        return namespace;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public String getNamespace() {
+		return namespace;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 }

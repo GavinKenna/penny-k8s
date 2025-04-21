@@ -135,10 +135,10 @@ public class PennyService {
 	public List<ServiceInfo> getAllServices() {
 		try {
 			return coreV1Api.listServiceForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
-					.getItems()
-					.stream()
-					.map(ServiceInfo::fromService)
-					.collect(Collectors.toList());
+				.getItems()
+				.stream()
+				.map(ServiceInfo::fromService)
+				.collect(Collectors.toList());
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to get Services", e);
@@ -190,9 +190,9 @@ public class PennyService {
 
 	public void watchServices(Consumer<Watch.Response<ServiceInfo>> onEvent) {
 		try {
-			watchResources(coreV1Api.listServiceForAllNamespacesCall(null, null, null, null, null, null, null, null,
-					60, true, null), new TypeToken<Watch.Response<V1Service>>() {
-			}, ServiceInfo::fromService, onEvent, "Service");
+			watchResources(coreV1Api.listServiceForAllNamespacesCall(null, null, null, null, null, null, null, null, 60,
+					true, null), new TypeToken<Watch.Response<V1Service>>() {
+					}, ServiceInfo::fromService, onEvent, "Service");
 		}
 		catch (ApiException e) {
 			throw new RuntimeException(e);
