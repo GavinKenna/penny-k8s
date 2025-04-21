@@ -16,10 +16,7 @@
 
 package ie.gkenna.pennyk8s.backend.controllers;
 
-import ie.gkenna.pennyk8s.backend.models.ConfigMapInfo;
-import ie.gkenna.pennyk8s.backend.models.DeploymentInfo;
-import ie.gkenna.pennyk8s.backend.models.NodeInfo;
-import ie.gkenna.pennyk8s.backend.models.PodInfo;
+import ie.gkenna.pennyk8s.backend.models.*;
 import ie.gkenna.pennyk8s.backend.services.PennyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +53,11 @@ public class K8sController {
 	@GetMapping("/deployments")
 	public List<DeploymentInfo> getDeploymentInfos() {
 		return this.pennyService.getAllDeployments();
+	}
+
+	@GetMapping("/namespaces")
+	public List<NamespaceInfo> getNamespaceInfos() {
+		return this.pennyService.getAllNamespaces();
 	}
 
 	@GetMapping("/pods/{namespace}/{podName}/logs")

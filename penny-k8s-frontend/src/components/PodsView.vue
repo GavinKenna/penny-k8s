@@ -154,7 +154,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
-import { useK8sRealtime } from "../composables/useK8sRealtime.js";
+import { pennyWebsockets } from "../composables/pennyWebsockets.js";
 import { fetchNodes, fetchPods, fetchLogs } from "../services/penny-service.js";
 
 const selectedPodLogs = ref({});
@@ -177,7 +177,7 @@ const selectedPod = ref(null);
 const errorMsg = ref(null);
 
 // Realtime Pods comes from WebSocket
-const { pods } = useK8sRealtime();
+const { pods } = pennyWebsockets();
 
 // Optional: Load REST version first in case WebSocket is delayed
 onMounted(async () => {

@@ -4,30 +4,24 @@ FROM openjdk:17-jdk-slim AS build
 RUN apt-get update && apt-get install -y maven
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /build
 
-# Copy the Maven build file to the container
-COPY pom.xml .
+# Copy the entire project including the parent and sibling modules
+COPY ../ .
 
-# Download the dependencies (this will cache them if they don't change)
-RUN mvn dependency:go-offline
+# Move into backend directory
+WORKDIR /build/penny-k8s-backend
 
-# Copy the rest of the application source code
-COPY src ./src
-
-# Build the Spring Boot app
+# Build the backend
 RUN mvn clean package -DskipTests
 
-# Stage 2: Use a lighter image to run the app
+# Stage 2: Minimal image to run
 FROM openjdk:17-jdk-slim
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the built JAR file from the previous stage
-COPY --from=build /app/target/penny-k8s-backend-0.2.0-SNAPSHOT-boot.jar app.jar
+COPY --from=build /build/penny-k8s-backend/target/*-boot.jar app.jar
 
 EXPOSE 8080
 
-# Run the Spring Boot app
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -17,22 +17,17 @@
 package ie.gkenna.pennyk8s.backend.services;
 
 import com.google.gson.reflect.TypeToken;
-import ie.gkenna.pennyk8s.backend.models.ConfigMapInfo;
-import ie.gkenna.pennyk8s.backend.models.DeploymentInfo;
-import ie.gkenna.pennyk8s.backend.models.NodeInfo;
-import ie.gkenna.pennyk8s.backend.models.PodInfo;
+import ie.gkenna.pennyk8s.backend.models.*;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1ConfigMap;
-import io.kubernetes.client.openapi.models.V1Deployment;
-import io.kubernetes.client.openapi.models.V1Node;
-import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.*;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Watch;
 import okhttp3.Call;
+import org.apache.juli.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,9 +55,11 @@ public class PennyService {
 		if (useInClusterConfig) {
 			// when running inside Kubernetes via Helm
 			client = Config.fromCluster();
+			LOGGER.info("Using Cluster config");
 		}
 		else {
 			// when running desktop or testing locally
+			LOGGER.info("Using local config file {}", kubeConfigPath);
 			client = Config.fromConfig(kubeConfigPath);
 		}
 		Configuration.setDefaultApiClient(client);
@@ -93,6 +90,19 @@ public class PennyService {
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to get pods", e);
+		}
+	}
+
+	public List<NamespaceInfo> getAllNamespaces() {
+		try {
+			return coreV1Api.listNamespace(null, null, null, null, null, null, null, null, null, null)
+				.getItems()
+				.stream()
+				.map(NamespaceInfo::fromNamespace)
+				.collect(Collectors.toList());
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Failed to get namespaces", e);
 		}
 	}
 
@@ -159,6 +169,17 @@ public class PennyService {
 			watchResources(appsV1Api.listDeploymentForAllNamespacesCall(null, null, null, null, null, null, null, null,
 					60, true, null), new TypeToken<Watch.Response<V1Deployment>>() {
 					}, DeploymentInfo::fromDeployment, onEvent, "Deployment");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void watchNamespaces(Consumer<Watch.Response<NamespaceInfo>> onEvent) {
+		try {
+			watchResources(coreV1Api.listNamespaceCall(null, null, null, null, null, null, null, null, 60, true, null),
+					new TypeToken<Watch.Response<V1Namespace>>() {
+					}, NamespaceInfo::fromNamespace, onEvent, "Namespace");
 		}
 		catch (ApiException e) {
 			throw new RuntimeException(e);

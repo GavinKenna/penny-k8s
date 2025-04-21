@@ -38,9 +38,9 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker Image for Backend
-        working-directory: penny-k8s-backend
+#        working-directory: penny-k8s-backend
         run: |
-          docker build -f Dockerfile \
+          docker build -f penny-k8s-backend/Dockerfile \
             -t ghcr.io/${{ env.REPO_OWNER_LC }}/penny-k8s-backend:${{ github.sha }} .
 
       - name: Push Docker Image for Backend
