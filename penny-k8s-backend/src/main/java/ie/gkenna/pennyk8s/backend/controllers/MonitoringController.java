@@ -30,30 +30,21 @@ public class MonitoringController {
 
 	@PostConstruct
 	public void initWatch() {
-		startWatchThread("ConfigMap", "/topic/configmaps",
-				() -> pennyService.watchConfigMaps(event ->
-						messagingTemplate.convertAndSend("/topic/configmaps", new ResourceEventDTO<>(event.type, event.object)))
-		);
+		startWatchThread("ConfigMap", "/topic/configmaps", () -> pennyService.watchConfigMaps(event -> messagingTemplate
+			.convertAndSend("/topic/configmaps", new ResourceEventDTO<>(event.type, event.object))));
 
-		startWatchThread("Pod", "/topic/pods",
-				() -> pennyService.watchPods(event ->
-						messagingTemplate.convertAndSend("/topic/pods", new ResourceEventDTO<>(event.type, event.object)))
-		);
+		startWatchThread("Pod", "/topic/pods", () -> pennyService.watchPods(event -> messagingTemplate
+			.convertAndSend("/topic/pods", new ResourceEventDTO<>(event.type, event.object))));
 
-		startWatchThread("Node", "/topic/nodes",
-				() -> pennyService.watchNodes(event ->
-						messagingTemplate.convertAndSend("/topic/nodes", new ResourceEventDTO<>(event.type, event.object)))
-		);
+		startWatchThread("Node", "/topic/nodes", () -> pennyService.watchNodes(event -> messagingTemplate
+			.convertAndSend("/topic/nodes", new ResourceEventDTO<>(event.type, event.object))));
 
 		startWatchThread("Deployment", "/topic/deployments",
-				() -> pennyService.watchDeployments(event ->
-						messagingTemplate.convertAndSend("/topic/deployments", new ResourceEventDTO<>(event.type, event.object)))
-		);
+				() -> pennyService.watchDeployments(event -> messagingTemplate.convertAndSend("/topic/deployments",
+						new ResourceEventDTO<>(event.type, event.object))));
 
-		startWatchThread("Namespace", "/topic/namespaces",
-				() -> pennyService.watchNamespaces(event ->
-						messagingTemplate.convertAndSend("/topic/namespaces", new ResourceEventDTO<>(event.type, event.object)))
-		);
+		startWatchThread("Namespace", "/topic/namespaces", () -> pennyService.watchNamespaces(event -> messagingTemplate
+			.convertAndSend("/topic/namespaces", new ResourceEventDTO<>(event.type, event.object))));
 	}
 
 	private void startWatchThread(String resourceType, String topic, Runnable watchTask) {
@@ -63,13 +54,16 @@ public class MonitoringController {
 					LOGGER.info("Starting {} watch...", resourceType);
 					watchTask.run();
 					LOGGER.warn("{} watch exited, restarting...", resourceType);
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					LOGGER.error("Exception in {} watch", resourceType, e);
 				}
 
 				try {
 					Thread.sleep(3000);
-				} catch (InterruptedException ignored) {}
+				}
+				catch (InterruptedException ignored) {
+				}
 			}
 		}, resourceType.toLowerCase() + "-watch-thread").start();
 	}
@@ -79,18 +73,22 @@ public class MonitoringController {
 			LOGGER.info("Starting {} watch...", resourceType);
 			watchTask.run();
 			LOGGER.warn("{} watch exited, restarting...", resourceType);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOGGER.error("Exception in {} watch", resourceType, e);
 		}
 		try {
 			Thread.sleep(3_000);
-		} catch (InterruptedException ignored) { }
+		}
+		catch (InterruptedException ignored) {
+		}
 	}
 
 	/** keep your old periodic fallback if you still want it */
 	@Scheduled(fixedRate = 10_000)
 	public void publishNodesAndPods() {
-		messagingTemplate.convertAndSend("/topic/nodes",  pennyService.getAllNodes());
-		messagingTemplate.convertAndSend("/topic/pods",   pennyService.getAllPods());
+		messagingTemplate.convertAndSend("/topic/nodes", pennyService.getAllNodes());
+		messagingTemplate.convertAndSend("/topic/pods", pennyService.getAllPods());
 	}
+
 }
