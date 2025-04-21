@@ -43,6 +43,10 @@ public class MonitoringController {
 				() -> pennyService.watchDeployments(event -> messagingTemplate.convertAndSend("/topic/deployments",
 						new ResourceEventDTO<>(event.type, event.object))));
 
+		startWatchThread("Service", "/topic/Services",
+				() -> pennyService.watchServices(event -> messagingTemplate.convertAndSend("/topic/Services",
+						new ResourceEventDTO<>(event.type, event.object))));
+
 		startWatchThread("Namespace", "/topic/namespaces", () -> pennyService.watchNamespaces(event -> messagingTemplate
 			.convertAndSend("/topic/namespaces", new ResourceEventDTO<>(event.type, event.object))));
 	}
@@ -84,7 +88,6 @@ public class MonitoringController {
 		}
 	}
 
-	/** keep your old periodic fallback if you still want it */
 	@Scheduled(fixedRate = 10_000)
 	public void publishNodesAndPods() {
 		messagingTemplate.convertAndSend("/topic/nodes", pennyService.getAllNodes());

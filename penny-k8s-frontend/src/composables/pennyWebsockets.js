@@ -8,6 +8,7 @@ const pods        = ref([])
 const deployments = ref([])
 const namespaces  = ref([])
 const configMaps  = ref([])
+const services  = ref([])
 
 let stompClient = null
 let isConnected = false
@@ -21,12 +22,14 @@ const loadInitial = async () => {
       axios.get('/api/deployments'),
       axios.get('/api/namespaces'),
       axios.get('/api/configmaps'),
+      axios.get('/api/services'),
     ])
     nodes.value       = nRes.data
     pods.value        = pRes.data
     deployments.value = dRes.data
     namespaces.value  = nsRes.data
     configMaps.value  = cmRes.data
+    services.value  = sRes.data
   } catch (err) {
     console.error('Initial Kubernetes load failed', err)
   }
@@ -66,6 +69,7 @@ const connectWebSocket = () => {
             || ev.deployment
             || ev.namespace
             || ev.configMap
+            || ev.services
 
         if (!ev.eventType || !obj || !obj.name) {
           console.warn('Unexpected WS event shape:', payload)
@@ -92,6 +96,7 @@ const connectWebSocket = () => {
       stompClient.subscribe('/topic/deployments', applyEvent(deployments))
       stompClient.subscribe('/topic/namespaces',  applyEvent(namespaces))
       stompClient.subscribe('/topic/configmaps',  applyEvent(configMaps))
+      stompClient.subscribe('/topic/services',  applyEvent(services))
     },
     onDisconnect: () => {
       console.log('WebSocket disconnected.')
@@ -123,5 +128,6 @@ export function pennyWebsockets() {
     deployments,
     namespaces,
     configMaps,
+    services,
   }
 }
