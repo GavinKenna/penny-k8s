@@ -20,6 +20,16 @@ export async function fetchPods() {
   }
 }
 
+export async function fetchNamespaces() {
+  try {
+    const response = await axios.get("/api/namespaces");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch namespaces:", error);
+    return [];
+  }
+}
+
 export async function fetchLogs(namespace, podName) {
   try {
     const response = await axios.get(`/api/pods/${namespace}/${podName}/logs`);

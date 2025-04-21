@@ -23,70 +23,43 @@ import java.util.Map;
 
 public class NamespaceInfo {
 
-    public String name;
+	public String name;
 
-    public String status;
+	private Map<String, String> annotations;
 
-    public String cpu;
+	private Map<String, String> labels;
 
-    public String memory;
-    private Map<String, String> annotations;
-    private Map<String, String> labels;
+	public static NamespaceInfo fromNamespace(V1Namespace namespace) {
+		NamespaceInfo info = new NamespaceInfo();
+		info.name = namespace.getMetadata().getName();
+		info.annotations = namespace.getMetadata().getAnnotations();
+		info.labels = namespace.getMetadata().getLabels();
 
-    public static NamespaceInfo fromNamespace(V1Namespace namespace) {
-        NamespaceInfo info = new NamespaceInfo();
-        info.name = namespace.getMetadata().getName();
-        info.annotations = namespace.getMetadata().getAnnotations();
-        info.labels = namespace.getMetadata().getLabels();
+		return info;
+	}
 
-        return info;
-    }
+	public Map<String, String> getAnnotations() {
+		return annotations;
+	}
 
-    public Map<String, String> getAnnotations() {
-        return annotations;
-    }
+	public void setAnnotations(Map<String, String> annotations) {
+		this.annotations = annotations;
+	}
 
-    public void setAnnotations(Map<String, String> annotations) {
-        this.annotations = annotations;
-    }
+	public Map<String, String> getLabels() {
+		return labels;
+	}
 
-    public Map<String, String> getLabels() {
-        return labels;
-    }
+	public void setLabels(Map<String, String> labels) {
+		this.labels = labels;
+	}
 
-    public void setLabels(Map<String, String> labels) {
-        this.labels = labels;
-    }
+	public String getName() {
+		return this.name;
+	}
 
-    public String getName() {
-        return this.name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getMemory() {
-        return this.memory;
-    }
-
-    public void setMemory(String memory) {
-        this.memory = memory;
-    }
-
-    public String getCpu() {
-        return this.cpu;
-    }
-
-    public void setCpu(String cpu) {
-        this.cpu = cpu;
-    }
-
-    public String getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

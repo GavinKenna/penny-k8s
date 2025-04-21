@@ -27,6 +27,7 @@ import io.kubernetes.client.openapi.models.*;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Watch;
 import okhttp3.Call;
+import org.apache.juli.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,9 +55,11 @@ public class PennyService {
 		if (useInClusterConfig) {
 			// when running inside Kubernetes via Helm
 			client = Config.fromCluster();
+			LOGGER.info("Using Cluster config");
 		}
 		else {
 			// when running desktop or testing locally
+			LOGGER.info("Using local config file {}", kubeConfigPath);
 			client = Config.fromConfig(kubeConfigPath);
 		}
 		Configuration.setDefaultApiClient(client);
@@ -93,10 +96,10 @@ public class PennyService {
 	public List<NamespaceInfo> getAllNamespaces() {
 		try {
 			return coreV1Api.listNamespace(null, null, null, null, null, null, null, null, null, null)
-					.getItems()
-					.stream()
-					.map(NamespaceInfo::fromNamespace)
-					.collect(Collectors.toList());
+				.getItems()
+				.stream()
+				.map(NamespaceInfo::fromNamespace)
+				.collect(Collectors.toList());
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to get namespaces", e);
@@ -174,9 +177,9 @@ public class PennyService {
 
 	public void watchNamespaces(Consumer<Watch.Response<NamespaceInfo>> onEvent) {
 		try {
-			watchResources(coreV1Api.listNamespaceCall(null, null, null, null, null, null, null, null,
-					60, true, null), new TypeToken<Watch.Response<V1Namespace>>() {
-			}, NamespaceInfo::fromNamespace, onEvent, "Namespace");
+			watchResources(coreV1Api.listNamespaceCall(null, null, null, null, null, null, null, null, 60, true, null),
+					new TypeToken<Watch.Response<V1Namespace>>() {
+					}, NamespaceInfo::fromNamespace, onEvent, "Namespace");
 		}
 		catch (ApiException e) {
 			throw new RuntimeException(e);

@@ -32,13 +32,13 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import { useK8sRealtime } from "../composables/useK8sRealtime.js";
+import { pennyWebsockets } from "../composables/pennyWebsockets.js";
 
 const selectedNode = ref(null);
 const errorMsg = ref(null);
 
 // Realtime Nodes comes from WebSocket
-const { nodes } = useK8sRealtime();
+const { nodes } = pennyWebsockets();
 
 // Optional: Load REST version first in case WebSocket is delayed
 onMounted(async () => {
