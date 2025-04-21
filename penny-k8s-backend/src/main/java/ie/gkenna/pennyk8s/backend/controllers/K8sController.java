@@ -55,6 +55,11 @@ public class K8sController {
 		return this.pennyService.getAllDeployments();
 	}
 
+	@GetMapping("/services")
+	public List<ServiceInfo> getServiceInfos() {
+		return this.pennyService.getAllServices();
+	}
+
 	@GetMapping("/namespaces")
 	public List<NamespaceInfo> getNamespaceInfos() {
 		return this.pennyService.getAllNamespaces();
