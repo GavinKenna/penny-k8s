@@ -14,30 +14,30 @@
       <div class="overflow-x-auto">
         <table class="min-w-full border-collapse">
           <thead>
-          <tr class="bg-gray-100">
-            <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">Namespace</th>
-            <th class="px-4 py-2 border"># of Keys</th>
-            <th class="px-4 py-2 border">Age</th>
-          </tr>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">Name</th>
+              <th class="px-4 py-2 border">Namespace</th>
+              <th class="px-4 py-2 border"># of Keys</th>
+              <th class="px-4 py-2 border">Age</th>
+            </tr>
           </thead>
           <tbody>
-          <tr
+            <tr
               v-for="cm in configMaps"
               :key="cm.name"
               class="border-b hover:bg-gray-50 cursor-pointer"
               :class="{ 'bg-blue-50': selectedConfigMap?.name === cm.name }"
               @click="selectConfigMap(cm)"
-          >
-            <td class="px-4 py-2 border">{{ cm.name }}</td>
-            <td class="px-4 py-2 border">{{ cm.namespace }}</td>
-            <td class="px-4 py-2 border">
-              {{ cm.data ? Object.keys(cm.data).length : 0 }}
-            </td>
-            <td class="px-4 py-2 border">
-              {{ formatDate(cm.creationTimestamp) }}
-            </td>
-          </tr>
+            >
+              <td class="px-4 py-2 border">{{ cm.name }}</td>
+              <td class="px-4 py-2 border">{{ cm.namespace }}</td>
+              <td class="px-4 py-2 border">
+                {{ cm.data ? Object.keys(cm.data).length : 0 }}
+              </td>
+              <td class="px-4 py-2 border">
+                {{ formatDate(cm.creationTimestamp) }}
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -53,19 +53,21 @@
           <strong>Namespace:</strong> {{ selectedConfigMap.namespace }}
         </p>
         <p class="mb-4">
-          <strong>Created:</strong> {{ formatDate(selectedConfigMap.creationTimestamp) }}
+          <strong>Created:</strong>
+          {{ formatDate(selectedConfigMap.creationTimestamp) }}
         </p>
 
         <div v-if="selectedConfigMap.data">
           <h4 class="text-xl font-semibold mb-2">Data:</h4>
           <div
-              v-for="(value, key) in selectedConfigMap.data"
-              :key="key"
-              class="mb-4"
+            v-for="(value, key) in selectedConfigMap.data"
+            :key="key"
+            class="mb-4"
           >
             <p class="font-medium">{{ key }}:</p>
-            <pre class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap">
-{{ value }}
+            <pre
+              class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap"
+              >{{ value }}
             </pre>
           </div>
         </div>
@@ -78,33 +80,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { pennyWebsockets } from '../composables/pennyWebsockets.js'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { pennyWebsockets } from "../composables/pennyWebsockets.js";
 
-const { configMaps } = pennyWebsockets()
-const selectedConfigMap = ref(null)
-const errorMsg = ref(null)
+const { configMaps } = pennyWebsockets();
+const selectedConfigMap = ref(null);
+const errorMsg = ref(null);
 
 function selectConfigMap(cm) {
-  selectedConfigMap.value = cm
+  selectedConfigMap.value = cm;
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return 'N/A'
-  return new Date(dateStr).toLocaleString()
+  if (!dateStr) return "N/A";
+  return new Date(dateStr).toLocaleString();
 }
 
 // Initial load
 onMounted(async () => {
   try {
-    const { data } = await axios.get('/api/configmaps')
-    configMaps.value = data
+    const { data } = await axios.get("/api/configmaps");
+    configMaps.value = data;
   } catch (err) {
-    console.error(err)
-    errorMsg.value = 'Failed to load existing ConfigMaps'
+    console.error(err);
+    errorMsg.value = "Failed to load existing ConfigMaps";
   }
-})
+});
 </script>
 
 <style scoped>

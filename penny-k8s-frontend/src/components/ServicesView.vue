@@ -14,32 +14,32 @@
       <div class="overflow-x-auto">
         <table class="min-w-full border-collapse">
           <thead>
-          <tr class="bg-gray-100">
-            <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">Namespace</th>
-            <th class="px-4 py-2 border">Type</th>
-          </tr>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">Name</th>
+              <th class="px-4 py-2 border">Namespace</th>
+              <th class="px-4 py-2 border">Type</th>
+            </tr>
           </thead>
           <tbody>
-          <tr
+            <tr
               v-for="d in services"
               :key="d.name"
               class="border-b hover:bg-gray-50"
               :class="{ 'bg-blue-50': selectedService?.name === d.name }"
-          >
-            <td class="px-4 py-2 border">{{ d.name }}</td>
-            <td class="px-4 py-2 border">{{ d.namespace }}</td>
-            <td class="px-4 py-2 border">{{ d.type }}</td>
+            >
+              <td class="px-4 py-2 border">{{ d.name }}</td>
+              <td class="px-4 py-2 border">{{ d.namespace }}</td>
+              <td class="px-4 py-2 border">{{ d.type }}</td>
 
-            <td class="px-4 py-2 border text-center">
-              <button
+              <td class="px-4 py-2 border text-center">
+                <button
                   class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                   @click="selectService(d)"
-              >
-                View
-              </button>
-            </td>
-          </tr>
+                >
+                  View
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -54,9 +54,7 @@
         <p class="mb-2">
           <strong>Namespace:</strong> {{ selectedService.namespace }}
         </p>
-        <p class="mb-2">
-          <strong>Type:</strong> {{ selectedService.type }}
-        </p>
+        <p class="mb-2"><strong>Type:</strong> {{ selectedService.type }}</p>
       </div>
       <div v-else class="text-gray-500 text-center mt-10">
         <p class="text-xl">Select a service to view details</p>
@@ -66,30 +64,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { pennyWebsockets } from '../composables/pennyWebsockets.js'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { pennyWebsockets } from "../composables/pennyWebsockets.js";
 
-const selectedService = ref(null)
-const errorMsg = ref(null)
+const selectedService = ref(null);
+const errorMsg = ref(null);
 
-const { services } = pennyWebsockets()
+const { services } = pennyWebsockets();
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/services')
+    const response = await axios.get("/api/services");
     if (services.value.length === 0) {
-      services.value = response.data
+      services.value = response.data;
     }
   } catch (error) {
-    console.error('Error fetching services via REST:', error)
-    errorMsg.value = 'Failed to load services'
+    console.error("Error fetching services via REST:", error);
+    errorMsg.value = "Failed to load services";
   }
-})
+});
 
 const selectService = (cm) => {
-  selectedService.value = cm
-}
+  selectedService.value = cm;
+};
 </script>
 
 <style scoped>

@@ -2,7 +2,11 @@
   <div class="flex h-screen w-full overflow-hidden bg-gray-50">
     <!-- Sidebar: Fixed width at the far left -->
     <aside class="w-56 bg-white border-r border-gray-200 p-10 flex-shrink-0">
-      <img src="../assets/pennyK8s.png" alt="Penny K8s" class="h-16 sm:h-20 lg:h-24 mx-auto mb-4" />
+      <img
+        src="../assets/pennyK8s.png"
+        alt="Penny K8s"
+        class="h-16 sm:h-20 lg:h-24 mx-auto mb-4"
+      />
       <nav class="space-y-2">
         <button
           v-for="view in views"
@@ -31,7 +35,14 @@ import DeploymentsView from "./DeploymentsView.vue";
 import NamespacesView from "./NamespacesView.vue";
 import ServicesView from "./ServicesView.vue";
 
-const views = ["Nodes", "Namespaces", "Pods", "ConfigMaps", "Deployments", "Services"];
+const views = [
+  "Nodes",
+  "Namespaces",
+  "Pods",
+  "ConfigMaps",
+  "Deployments",
+  "Services",
+];
 const selectedView = ref("Pods");
 
 const getComponentForView = (view) => {
@@ -44,7 +55,7 @@ const getComponentForView = (view) => {
       return ConfigMapsView;
     case "Deployments":
       return DeploymentsView;
-      case "Services":
+    case "Services":
       return ServicesView;
     default:
       return PodsView;
