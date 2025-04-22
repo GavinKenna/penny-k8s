@@ -14,40 +14,40 @@
       <div class="overflow-x-auto">
         <table class="min-w-full border-collapse">
           <thead>
-          <tr class="bg-gray-100">
-            <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">Namespace</th>
-            <th class="px-4 py-2 border">Replicas</th>
-            <th class="px-4 py-2 border">Available</th>
-            <th class="px-4 py-2 border">Updated</th>
-            <th class="px-4 py-2 border"># Containers</th>
-            <th class="px-4 py-2 border text-center">Actions</th>
-          </tr>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">Name</th>
+              <th class="px-4 py-2 border">Namespace</th>
+              <th class="px-4 py-2 border">Replicas</th>
+              <th class="px-4 py-2 border">Available</th>
+              <th class="px-4 py-2 border">Updated</th>
+              <th class="px-4 py-2 border"># Containers</th>
+              <th class="px-4 py-2 border text-center">Actions</th>
+            </tr>
           </thead>
           <tbody>
-          <tr
+            <tr
               v-for="d in deployments"
               :key="d.name"
               class="border-b hover:bg-gray-50"
               :class="{ 'bg-blue-50': selectedDeployment?.name === d.name }"
-          >
-            <td class="px-4 py-2 border">{{ d.name }}</td>
-            <td class="px-4 py-2 border">{{ d.namespace }}</td>
-            <td class="px-4 py-2 border">{{ d.replicas }}</td>
-            <td class="px-4 py-2 border">{{ d.availableReplicas }}</td>
-            <td class="px-4 py-2 border">{{ d.updatedReplicas }}</td>
-            <td class="px-4 py-2 border">
-              {{ d.containers ? Object.keys(d.containers).length : 0 }}
-            </td>
-            <td class="px-4 py-2 border text-center">
-              <button
+            >
+              <td class="px-4 py-2 border">{{ d.name }}</td>
+              <td class="px-4 py-2 border">{{ d.namespace }}</td>
+              <td class="px-4 py-2 border">{{ d.replicas }}</td>
+              <td class="px-4 py-2 border">{{ d.availableReplicas }}</td>
+              <td class="px-4 py-2 border">{{ d.updatedReplicas }}</td>
+              <td class="px-4 py-2 border">
+                {{ d.containers ? Object.keys(d.containers).length : 0 }}
+              </td>
+              <td class="px-4 py-2 border text-center">
+                <button
                   class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                   @click="selectDeployment(d)"
-              >
-                View
-              </button>
-            </td>
-          </tr>
+                >
+                  View
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -66,22 +66,25 @@
           <strong>Replicas:</strong> {{ selectedDeployment.replicas }}
         </p>
         <p class="mb-2">
-          <strong>Available Replicas:</strong> {{ selectedDeployment.availableReplicas }}
+          <strong>Available Replicas:</strong>
+          {{ selectedDeployment.availableReplicas }}
         </p>
         <p class="mb-4">
-          <strong>Updated Replicas:</strong> {{ selectedDeployment.updatedReplicas }}
+          <strong>Updated Replicas:</strong>
+          {{ selectedDeployment.updatedReplicas }}
         </p>
 
         <div v-if="selectedDeployment.containers">
           <h4 class="text-xl font-semibold mb-2">Containers:</h4>
           <div
-              v-for="(value, key) in selectedDeployment.containers"
-              :key="key"
-              class="mb-3"
+            v-for="(value, key) in selectedDeployment.containers"
+            :key="key"
+            class="mb-3"
           >
             <p class="font-medium">{{ key }}:</p>
-            <pre class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap">
-{{ value }}
+            <pre
+              class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap"
+              >{{ value }}
             </pre>
           </div>
         </div>
@@ -94,30 +97,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { pennyWebsockets } from '../composables/pennyWebsockets.js'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { pennyWebsockets } from "../composables/pennyWebsockets.js";
 
-const selectedDeployment = ref(null)
-const errorMsg = ref(null)
+const selectedDeployment = ref(null);
+const errorMsg = ref(null);
 
-const { deployments } = pennyWebsockets()
+const { deployments } = pennyWebsockets();
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/deployments')
+    const response = await axios.get("/api/deployments");
     if (deployments.value.length === 0) {
-      deployments.value = response.data
+      deployments.value = response.data;
     }
   } catch (error) {
-    console.error('Error fetching deployments via REST:', error)
-    errorMsg.value = 'Failed to load deployments'
+    console.error("Error fetching deployments via REST:", error);
+    errorMsg.value = "Failed to load deployments";
   }
-})
+});
 
 const selectDeployment = (cm) => {
-  selectedDeployment.value = cm
-}
+  selectedDeployment.value = cm;
+};
 </script>
 
 <style scoped>
