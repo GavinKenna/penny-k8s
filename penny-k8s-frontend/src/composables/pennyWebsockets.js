@@ -9,6 +9,11 @@ const deployments = ref([]);
 const namespaces = ref([]);
 const configMaps = ref([]);
 const services = ref([]);
+const clusterRoles = ref([]);
+const roleBindings = ref([]);
+const roles = ref([]);
+const secrets = ref([]);
+const statefulSets = ref([]);
 
 let stompClient = null;
 let isConnected = false;
@@ -16,13 +21,29 @@ let hasInitialized = false;
 
 const loadInitial = async () => {
   try {
-    const [nRes, pRes, dRes, nsRes, cmRes] = await Promise.all([
+    const [
+      nRes,
+      pRes,
+      dRes,
+      nsRes,
+      cmRes,
+      sRes,
+      crRes,
+      rbRes,
+      rRes,
+      stRes,
+      sfRes,
+    ] = await Promise.all([
       axios.get("/api/nodes"),
       axios.get("/api/pods"),
       axios.get("/api/deployments"),
       axios.get("/api/namespaces"),
       axios.get("/api/configmaps"),
-      axios.get("/api/services"),
+      axios.get("/api/clusterRoles"),
+      axios.get("/api/roleBindings"),
+      axios.get("/api/roles"),
+      axios.get("/api/secrets"),
+      axios.get("/api/statefulSets"),
     ]);
     nodes.value = nRes.data;
     pods.value = pRes.data;
@@ -30,6 +51,11 @@ const loadInitial = async () => {
     namespaces.value = nsRes.data;
     configMaps.value = cmRes.data;
     services.value = sRes.data;
+    clusterRoles.value = crRes.data;
+    roleBindings.value = rbRes.data;
+    roles.value = rRes.data;
+    secrets.value = stRes.data;
+    statefulSets.value = sfRes.data;
   } catch (err) {
     console.error("Initial Kubernetes load failed", err);
   }
@@ -96,6 +122,11 @@ const connectWebSocket = () => {
       stompClient.subscribe("/topic/namespaces", applyEvent(namespaces));
       stompClient.subscribe("/topic/configmaps", applyEvent(configMaps));
       stompClient.subscribe("/topic/services", applyEvent(services));
+      stompClient.subscribe("/topic/clusterRoles", applyEvent(clusterRoles));
+      stompClient.subscribe("/topic/roleBindings", applyEvent(roleBindings));
+      stompClient.subscribe("/topic/roles", applyEvent(roles));
+      stompClient.subscribe("/topic/secrets", applyEvent(secrets));
+      stompClient.subscribe("/topic/statefulSets", applyEvent(statefulSets));
     },
     onDisconnect: () => {
       console.log("WebSocket disconnected.");
@@ -128,5 +159,10 @@ export function pennyWebsockets() {
     namespaces,
     configMaps,
     services,
+    clusterRoles,
+    roleBindings,
+    roles,
+    secrets,
+    statefulSets,
   };
 }

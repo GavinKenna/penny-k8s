@@ -65,6 +65,31 @@ public class K8sController {
 		return this.pennyService.getAllNamespaces();
 	}
 
+	@GetMapping("/clusterRoles")
+	public List<ClusterRoleInfo> getClusterRoleInfos() {
+		return this.pennyService.getAllClusterRoles();
+	}
+
+	@GetMapping("/roleBindings")
+	public List<RoleBindingInfo> getRoleBindingInfos() {
+		return this.pennyService.getAllRoleBindings();
+	}
+
+	@GetMapping("/roles")
+	public List<RoleInfo> getRoleInfos() {
+		return this.pennyService.getAllRoles();
+	}
+
+	@GetMapping("/secrets")
+	public List<SecretInfo> getSecretInfos() {
+		return this.pennyService.getAllSecrets();
+	}
+
+	@GetMapping("/statefulSets")
+	public List<StatefulSetInfo> getStatefulSetInfos() {
+		return this.pennyService.getAllStatefulSets();
+	}
+
 	@GetMapping("/pods/{namespace}/{podName}/logs")
 	public String getPodLogs(@PathVariable String namespace, @PathVariable String podName) {
 		return this.pennyService.getPodLogs(namespace, podName);

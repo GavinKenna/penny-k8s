@@ -34,6 +34,11 @@ import ConfigMapsView from "./ConfigMapsView.vue";
 import DeploymentsView from "./DeploymentsView.vue";
 import NamespacesView from "./NamespacesView.vue";
 import ServicesView from "./ServicesView.vue";
+import ClusterRolesView from "./ClusterRolesView.vue";
+import RoleBindingsView from "./RoleBindingsView.vue";
+import RolesView from "./RolesView.vue";
+import SecretsView from "./SecretsView.vue";
+import StatefulSetsView from "./StatefulSetsView.vue";
 
 const views = [
   "Nodes",
@@ -42,6 +47,11 @@ const views = [
   "ConfigMaps",
   "Deployments",
   "Services",
+  "Cluster Roles",
+  "Role Bindings",
+  "Roles",
+  "Secrets",
+  "Stateful Sets",
 ];
 const selectedView = ref("Pods");
 
@@ -57,6 +67,16 @@ const getComponentForView = (view) => {
       return DeploymentsView;
     case "Services":
       return ServicesView;
+    case "Cluster Roles":
+      return ClusterRolesView;
+    case "Role Bindings":
+      return RoleBindingsView;
+    case "Roles":
+      return RolesView;
+    case "Secrets":
+      return SecretsView;
+    case "Stateful Sets":
+      return StatefulSetsView;
     default:
       return PodsView;
   }

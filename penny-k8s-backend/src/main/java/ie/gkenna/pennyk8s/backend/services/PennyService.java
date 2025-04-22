@@ -7,6 +7,7 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.apis.RbacAuthorizationV1Api;
 import io.kubernetes.client.openapi.models.*;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Watch;
@@ -32,6 +33,8 @@ public class PennyService {
 
 	private final AppsV1Api appsV1Api;
 
+	private final RbacAuthorizationV1Api rbacApi;
+
 	private final ApiClient client;
 
 	public PennyService(@Value("${k8s.useInClusterConfig}") boolean useInClusterConfig,
@@ -41,6 +44,7 @@ public class PennyService {
 		Configuration.setDefaultApiClient(client);
 		coreV1Api = new CoreV1Api(client);
 		appsV1Api = new AppsV1Api(client);
+		rbacApi = new RbacAuthorizationV1Api(client);
 	}
 
 	public List<NodeInfo> getAllNodes() {
@@ -101,6 +105,56 @@ public class PennyService {
 		}
 		catch (ApiException e) {
 			throw new RuntimeException("Failed to list services", e);
+		}
+	}
+
+	public List<RoleBindingInfo> getAllRoleBindings() {
+		try {
+			V1RoleBindingList list = rbacApi.listRoleBindingForAllNamespaces().execute();
+			return list.getItems().stream().map(RoleBindingInfo::fromRoleBinding).collect(Collectors.toList());
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list roleBindings", e);
+		}
+	}
+
+	public List<RoleInfo> getAllRoles() {
+		try {
+			V1RoleList list = rbacApi.listRoleForAllNamespaces().execute();
+			return list.getItems().stream().map(RoleInfo::fromRole).collect(Collectors.toList());
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list roles", e);
+		}
+	}
+
+	public List<SecretInfo> getAllSecrets() {
+		try {
+			V1SecretList list = coreV1Api.listSecretForAllNamespaces().execute();
+			return list.getItems().stream().map(SecretInfo::fromSecret).collect(Collectors.toList());
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list secrets", e);
+		}
+	}
+
+	public List<StatefulSetInfo> getAllStatefulSets() {
+		try {
+			V1StatefulSetList list = appsV1Api.listStatefulSetForAllNamespaces().execute();
+			return list.getItems().stream().map(StatefulSetInfo::fromStatefulSet).collect(Collectors.toList());
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list statefulSets", e);
+		}
+	}
+
+	public List<ClusterRoleInfo> getAllClusterRoles() {
+		try {
+			V1ClusterRoleList list = rbacApi.listClusterRole().execute();
+			return list.getItems().stream().map(ClusterRoleInfo::fromClusterRole).collect(Collectors.toList());
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list clusterRoles", e);
 		}
 	}
 
@@ -205,6 +259,77 @@ public class PennyService {
 		}
 		catch (ApiException e) {
 			throw new RuntimeException("Failed to watch services", e);
+		}
+	}
+
+	public void watchStatefulSets(Consumer<Watch.Response<StatefulSetInfo>> onEvent) {
+		try {
+			AppsV1Api.APIlistStatefulSetForAllNamespacesRequest req = appsV1Api.listStatefulSetForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1StatefulSet>>() {
+			}.getType(), StatefulSetInfo::fromStatefulSet, onEvent, "StatefulSet");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch statefulSets", e);
+		}
+	}
+
+	public void watchClusterRoles(Consumer<Watch.Response<ClusterRoleInfo>> onEvent) {
+		try {
+			RbacAuthorizationV1Api.APIlistClusterRoleRequest req = rbacApi.listClusterRole()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1ClusterRole>>() {
+			}.getType(), ClusterRoleInfo::fromClusterRole, onEvent, "ClusterRole");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch clusterRoles", e);
+		}
+	}
+
+	public void watchRoleBindings(Consumer<Watch.Response<RoleBindingInfo>> onEvent) {
+		try {
+			RbacAuthorizationV1Api.APIlistRoleBindingForAllNamespacesRequest req = rbacApi
+				.listRoleBindingForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1RoleBinding>>() {
+			}.getType(), RoleBindingInfo::fromRoleBinding, onEvent, "RoleBinding");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch roleBindings", e);
+		}
+	}
+
+	public void watchRoles(Consumer<Watch.Response<RoleInfo>> onEvent) {
+		try {
+			RbacAuthorizationV1Api.APIlistRoleForAllNamespacesRequest req = rbacApi.listRoleForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1Role>>() {
+			}.getType(), RoleInfo::fromRole, onEvent, "Role");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch roles", e);
+		}
+	}
+
+	public void watchSecrets(Consumer<Watch.Response<SecretInfo>> onEvent) {
+		try {
+			CoreV1Api.APIlistSecretForAllNamespacesRequest req = coreV1Api.listSecretForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1Secret>>() {
+			}.getType(), SecretInfo::fromSecret, onEvent, "Secret");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch secrets", e);
 		}
 	}
 
