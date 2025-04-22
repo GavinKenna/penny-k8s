@@ -48,6 +48,24 @@ public class MonitoringController {
 
 		startWatchThread("Namespace", "/topic/namespaces", () -> pennyService.watchNamespaces(event -> messagingTemplate
 			.convertAndSend("/topic/namespaces", new ResourceEventDTO<>(event.type, event.object))));
+
+		startWatchThread("ClusterRole", "/topic/clusterRoles",
+				() -> pennyService.watchClusterRoles(event -> messagingTemplate.convertAndSend("/topic/clusterRoles",
+						new ResourceEventDTO<>(event.type, event.object))));
+
+		startWatchThread("RoleBinding", "/topic/roleBindings",
+				() -> pennyService.watchRoleBindings(event -> messagingTemplate.convertAndSend("/topic/roleBindings",
+						new ResourceEventDTO<>(event.type, event.object))));
+
+		startWatchThread("Role", "/topic/roles", () -> pennyService.watchRoles(event -> messagingTemplate
+			.convertAndSend("/topic/roles", new ResourceEventDTO<>(event.type, event.object))));
+
+		startWatchThread("Secret", "/topic/secrets", () -> pennyService.watchSecrets(event -> messagingTemplate
+			.convertAndSend("/topic/secrets", new ResourceEventDTO<>(event.type, event.object))));
+
+		startWatchThread("StatefulSet", "/topic/statefulSets",
+				() -> pennyService.watchStatefulSets(event -> messagingTemplate.convertAndSend("/topic/statefulSets",
+						new ResourceEventDTO<>(event.type, event.object))));
 	}
 
 	private void startWatchThread(String resourceType, String topic, Runnable watchTask) {
