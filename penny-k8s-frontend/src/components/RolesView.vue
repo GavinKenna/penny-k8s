@@ -14,20 +14,20 @@
       <div class="overflow-x-auto">
         <table class="min-w-full border-collapse">
           <thead>
-          <tr class="bg-gray-100">
-            <th class="px-4 py-2 border">Name</th>
-          </tr>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">Name</th>
+            </tr>
           </thead>
           <tbody>
-          <tr
+            <tr
               v-for="cm in roles"
               :key="cm.name"
               class="border-b hover:bg-gray-50 cursor-pointer"
               :class="{ 'bg-blue-50': selectedRole?.name === cm.name }"
               @click="selectRole(cm)"
-          >
-            <td class="px-4 py-2 border">{{ cm.name }}</td>
-          </tr>
+            >
+              <td class="px-4 py-2 border">{{ cm.name }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -43,14 +43,14 @@
         <div v-if="selectedRole.rules">
           <h4 class="text-xl font-semibold mb-2">Rules:</h4>
           <div
-              v-for="(value, key) in selectedRole.rules"
-              :key="key"
-              class="mb-4"
+            v-for="(value, key) in selectedRole.rules"
+            :key="key"
+            class="mb-4"
           >
             <p class="font-medium">{{ key }}:</p>
             <pre
-                class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap"
-            >{{ value }}
+              class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap"
+              >{{ value }}
             </pre>
           </div>
         </div>
@@ -83,7 +83,7 @@ function formatDate(dateStr) {
 // Initial load
 onMounted(async () => {
   try {
-    const {data} = await axios.get("/api/roles");
+    const { data } = await axios.get("/api/roles");
     roles.value = data;
   } catch (err) {
     console.error(err);

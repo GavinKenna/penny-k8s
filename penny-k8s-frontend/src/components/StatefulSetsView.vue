@@ -14,25 +14,24 @@
       <div class="overflow-x-auto">
         <table class="min-w-full border-collapse">
           <thead>
-          <tr class="bg-gray-100">
-            <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">Available Replicas</th>
-            <th class="px-4 py-2 border">Replicas</th>
-          </tr>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">Name</th>
+              <th class="px-4 py-2 border">Available Replicas</th>
+              <th class="px-4 py-2 border">Replicas</th>
+            </tr>
           </thead>
           <tbody>
-          <tr
+            <tr
               v-for="cm in statefulSets"
               :key="cm.name"
               class="border-b hover:bg-gray-50 cursor-pointer"
               :class="{ 'bg-blue-50': selectedStatefulSet?.name === cm.name }"
               @click="selectStatefulSet(cm)"
-          >
-            <td class="px-4 py-2 border">{{ cm.name }}</td>
-            <td class="px-4 py-2 border">{{ cm.availableReplicas }}</td>
-            <td class="px-4 py-2 border">{{ cm.replicas }}</td>
-
-          </tr>
+            >
+              <td class="px-4 py-2 border">{{ cm.name }}</td>
+              <td class="px-4 py-2 border">{{ cm.availableReplicas }}</td>
+              <td class="px-4 py-2 border">{{ cm.replicas }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -56,14 +55,14 @@
         <div v-if="selectedStatefulSet.conditions">
           <h4 class="text-xl font-semibold mb-2">Conditions:</h4>
           <div
-              v-for="(value, key) in selectedStatefulSet.conditions"
-              :key="key"
-              class="mb-4"
+            v-for="(value, key) in selectedStatefulSet.conditions"
+            :key="key"
+            class="mb-4"
           >
             <p class="font-medium">{{ key }}:</p>
             <pre
-                class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap"
-            >{{ value }}
+              class="bg-gray-100 p-2 border rounded text-sm overflow-auto whitespace-pre-wrap"
+              >{{ value }}
             </pre>
           </div>
         </div>
@@ -96,7 +95,7 @@ function formatDate(dateStr) {
 // Initial load
 onMounted(async () => {
   try {
-    const {data} = await axios.get("/api/statefulSets");
+    const { data } = await axios.get("/api/statefulSets");
     statefulSets.value = data;
   } catch (err) {
     console.error(err);

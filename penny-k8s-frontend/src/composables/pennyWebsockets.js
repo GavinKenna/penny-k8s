@@ -21,7 +21,19 @@ let hasInitialized = false;
 
 const loadInitial = async () => {
   try {
-    const [nRes, pRes, dRes, nsRes, cmRes, sRes,crRes,rbRes,rRes, stRes,sfRes] = await Promise.all([
+    const [
+      nRes,
+      pRes,
+      dRes,
+      nsRes,
+      cmRes,
+      sRes,
+      crRes,
+      rbRes,
+      rRes,
+      stRes,
+      sfRes,
+    ] = await Promise.all([
       axios.get("/api/nodes"),
       axios.get("/api/pods"),
       axios.get("/api/deployments"),
