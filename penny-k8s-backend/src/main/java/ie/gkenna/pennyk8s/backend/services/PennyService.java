@@ -1,19 +1,3 @@
-/*
- * Copyright 2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package ie.gkenna.pennyk8s.backend.services;
 
 import com.google.gson.reflect.TypeToken;
@@ -27,13 +11,13 @@ import io.kubernetes.client.openapi.models.*;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Watch;
 import okhttp3.Call;
-import org.apache.juli.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -52,187 +36,193 @@ public class PennyService {
 
 	public PennyService(@Value("${k8s.useInClusterConfig}") boolean useInClusterConfig,
 			@Value("${k8s.kubeConfigPath}") String kubeConfigPath) throws IOException {
-		if (useInClusterConfig) {
-			// when running inside Kubernetes via Helm
-			client = Config.fromCluster();
-			LOGGER.info("Using Cluster config");
-		}
-		else {
-			// when running desktop or testing locally
-			LOGGER.info("Using local config file {}", kubeConfigPath);
-			client = Config.fromConfig(kubeConfigPath);
-		}
+		// pick in‑cluster vs. kubeconfig
+		client = useInClusterConfig ? Config.fromCluster() : Config.fromConfig(kubeConfigPath);
 		Configuration.setDefaultApiClient(client);
-		this.coreV1Api = new CoreV1Api(client);
-		this.appsV1Api = new AppsV1Api(client);
+		coreV1Api = new CoreV1Api(client);
+		appsV1Api = new AppsV1Api(client);
 	}
 
 	public List<NodeInfo> getAllNodes() {
 		try {
-			return coreV1Api.listNode(null, null, null, null, null, null, null, null, null, null)
-				.getItems()
-				.stream()
-				.map(NodeInfo::fromNode)
-				.collect(Collectors.toList());
+			V1NodeList list = coreV1Api.listNode() // builder
+				.execute(); // run
+			return list.getItems().stream().map(NodeInfo::fromNode).collect(Collectors.toList());
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to get nodes", e);
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list nodes", e);
 		}
 	}
 
 	public List<PodInfo> getAllPods() {
 		try {
-			return coreV1Api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
-				.getItems()
-				.stream()
-				.map(PodInfo::fromPod)
-				.collect(Collectors.toList());
+			V1PodList list = coreV1Api.listPodForAllNamespaces().execute();
+			return list.getItems().stream().map(PodInfo::fromPod).collect(Collectors.toList());
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to get pods", e);
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list pods", e);
 		}
 	}
 
 	public List<NamespaceInfo> getAllNamespaces() {
 		try {
-			return coreV1Api.listNamespace(null, null, null, null, null, null, null, null, null, null)
-				.getItems()
-				.stream()
-				.map(NamespaceInfo::fromNamespace)
-				.collect(Collectors.toList());
+			V1NamespaceList list = coreV1Api.listNamespace().execute();
+			return list.getItems().stream().map(NamespaceInfo::fromNamespace).collect(Collectors.toList());
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to get namespaces", e);
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list namespaces", e);
 		}
 	}
 
 	public List<ConfigMapInfo> getAllConfigMaps() {
 		try {
-			return coreV1Api.listConfigMapForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
-				.getItems()
-				.stream()
-				.map(ConfigMapInfo::fromConfigMap)
-				.collect(Collectors.toList());
+			V1ConfigMapList list = coreV1Api.listConfigMapForAllNamespaces().execute();
+			return list.getItems().stream().map(ConfigMapInfo::fromConfigMap).collect(Collectors.toList());
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to get ConfigMaps", e);
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list configmaps", e);
 		}
 	}
 
 	public List<DeploymentInfo> getAllDeployments() {
 		try {
-			return appsV1Api.listDeploymentForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
-				.getItems()
-				.stream()
-				.map(DeploymentInfo::fromDeployment)
-				.collect(Collectors.toList());
+			V1DeploymentList list = appsV1Api.listDeploymentForAllNamespaces().execute();
+			return list.getItems().stream().map(DeploymentInfo::fromDeployment).collect(Collectors.toList());
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to get Deployments", e);
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list deployments", e);
 		}
 	}
 
 	public List<ServiceInfo> getAllServices() {
 		try {
-			return coreV1Api.listServiceForAllNamespaces(null, null, null, null, null, null, null, null, null, null)
-				.getItems()
-				.stream()
-				.map(ServiceInfo::fromService)
-				.collect(Collectors.toList());
+			V1ServiceList list = coreV1Api.listServiceForAllNamespaces().execute();
+			return list.getItems().stream().map(ServiceInfo::fromService).collect(Collectors.toList());
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to get Services", e);
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to list services", e);
 		}
 	}
 
+	/**
+	 * Read logs of a single Pod.
+	 */
 	public String getPodLogs(String namespace, String podName) {
 		try {
-			return coreV1Api.readNamespacedPodLog(podName, namespace, null, null, null, null, null, null, null, null,
-					null);
+			return coreV1Api.readNamespacedPodLog(podName, namespace) // builder
+				.container(null)
+				.follow(false)
+				.pretty(null)
+				.previous(false)
+				.sinceSeconds(null)
+				// .sinceTime(null)
+				.tailLines(null)
+				.timestamps(false)
+				.limitBytes(null)
+				.execute(); // runs and returns the log String
 		}
-		catch (Exception e) {
+		catch (ApiException e) {
 			throw new RuntimeException("Failed to get logs for pod " + podName, e);
+		}
+	}
+
+	// stream watchers for nodes, pods, etc
+
+	public void watchNodes(Consumer<Watch.Response<NodeInfo>> onEvent) {
+		try {
+			CoreV1Api.APIlistNodeRequest req = coreV1Api.listNode().watch(true).timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1Node>>() {
+			}.getType(), NodeInfo::fromNode, onEvent, "Node");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch nodes", e);
 		}
 	}
 
 	public void watchPods(Consumer<Watch.Response<PodInfo>> onEvent) {
 		try {
-			watchResources(coreV1Api.listPodForAllNamespacesCall(null, null, null, null, null, null, null, null, 60,
-					true, null), new TypeToken<Watch.Response<V1Pod>>() {
-					}, PodInfo::fromPod, onEvent, "Pod");
+			CoreV1Api.APIlistPodForAllNamespacesRequest req = coreV1Api.listPodForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1Pod>>() {
+			}.getType(), PodInfo::fromPod, onEvent, "Pod");
 		}
 		catch (ApiException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void watchNodes(Consumer<Watch.Response<NodeInfo>> onEvent) {
-		try {
-			watchResources(coreV1Api.listNodeCall(null, null, null, null, null, null, null, null, 60, true, null),
-					new TypeToken<Watch.Response<V1Node>>() {
-					}, NodeInfo::fromNode, onEvent, "Node");
-		}
-		catch (ApiException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void watchDeployments(Consumer<Watch.Response<DeploymentInfo>> onEvent) {
-		try {
-			watchResources(appsV1Api.listDeploymentForAllNamespacesCall(null, null, null, null, null, null, null, null,
-					60, true, null), new TypeToken<Watch.Response<V1Deployment>>() {
-					}, DeploymentInfo::fromDeployment, onEvent, "Deployment");
-		}
-		catch (ApiException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void watchServices(Consumer<Watch.Response<ServiceInfo>> onEvent) {
-		try {
-			watchResources(coreV1Api.listServiceForAllNamespacesCall(null, null, null, null, null, null, null, null, 60,
-					true, null), new TypeToken<Watch.Response<V1Service>>() {
-					}, ServiceInfo::fromService, onEvent, "Service");
-		}
-		catch (ApiException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Failed to watch pods", e);
 		}
 	}
 
 	public void watchNamespaces(Consumer<Watch.Response<NamespaceInfo>> onEvent) {
 		try {
-			watchResources(coreV1Api.listNamespaceCall(null, null, null, null, null, null, null, null, 60, true, null),
-					new TypeToken<Watch.Response<V1Namespace>>() {
-					}, NamespaceInfo::fromNamespace, onEvent, "Namespace");
+			CoreV1Api.APIlistNamespaceRequest req = coreV1Api.listNamespace().watch(true).timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1Namespace>>() {
+			}.getType(), NamespaceInfo::fromNamespace, onEvent, "Namespace");
 		}
 		catch (ApiException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Failed to watch namespaces", e);
 		}
 	}
 
 	public void watchConfigMaps(Consumer<Watch.Response<ConfigMapInfo>> onEvent) {
 		try {
-			watchResources(coreV1Api.listConfigMapForAllNamespacesCall(null, null, null, null, null, null, null, null,
-					60, true, null), new TypeToken<Watch.Response<V1ConfigMap>>() {
-					}, ConfigMapInfo::fromV1ConfigMap, onEvent, "ConfigMap");
+			CoreV1Api.APIlistConfigMapForAllNamespacesRequest req = coreV1Api.listConfigMapForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1ConfigMap>>() {
+			}.getType(), ConfigMapInfo::fromConfigMap, onEvent, "ConfigMap");
 		}
 		catch (ApiException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Failed to watch configmaps", e);
 		}
 	}
 
-	private <T, R> void watchResources(Call call, TypeToken<Watch.Response<T>> typeToken, Function<T, R> mapper,
+	public void watchDeployments(Consumer<Watch.Response<DeploymentInfo>> onEvent) {
+		try {
+			AppsV1Api.APIlistDeploymentForAllNamespacesRequest req = appsV1Api.listDeploymentForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1Deployment>>() {
+			}.getType(), DeploymentInfo::fromDeployment, onEvent, "Deployment");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch deployments", e);
+		}
+	}
+
+	public void watchServices(Consumer<Watch.Response<ServiceInfo>> onEvent) {
+		try {
+			CoreV1Api.APIlistServiceForAllNamespacesRequest req = coreV1Api.listServiceForAllNamespaces()
+				.watch(true)
+				.timeoutSeconds(60);
+			Call call = req.buildCall(null);
+			watchResources(call, new TypeToken<Watch.Response<V1Service>>() {
+			}.getType(), ServiceInfo::fromService, onEvent, "Service");
+		}
+		catch (ApiException e) {
+			throw new RuntimeException("Failed to watch services", e);
+		}
+	}
+
+	/**
+	 * Helper that spins over the watch‐stream
+	 */
+	private <T, R> void watchResources(Call call, Type responseType, Function<T, R> mapper,
 			Consumer<Watch.Response<R>> onEvent, String resourceName) {
-		try (Watch<T> watch = Watch.createWatch(client, call, typeToken.getType())) {
+		try (Watch<T> watch = Watch.createWatch(client, call, responseType)) {
 			for (Watch.Response<T> item : watch) {
 				R dto = mapper.apply(item.object);
-				Watch.Response<R> event = new Watch.Response<>(item.type, dto);
-				LOGGER.info("Publishing {} event: {} for {}", resourceName, event.type, dto.toString());
-				onEvent.accept(event);
+				Watch.Response<R> ev = new Watch.Response<>(item.type, dto);
+				LOGGER.info("Publishing {} event: {} for {}", resourceName, ev.type, dto);
+				onEvent.accept(ev);
 			}
 		}
 		catch (Exception e) {
-			LOGGER.error("Error watching {}s", resourceName, e);
+			LOGGER.error("Error watching " + resourceName, e);
 		}
 	}
 
